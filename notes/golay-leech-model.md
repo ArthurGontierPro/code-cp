@@ -309,3 +309,25 @@ K=4 at n=36 and GCS K=3 at n=48 died at the 8 GB cap during flattening/posting. 
 [72,36,12] doubly-even self-dual code is found (one of Gulliver-Harada's 134). No UNSAT
 for d=16 at 72 (the expected, known answer): the eager model is too big, the lazy loop
 restarts from scratch each round. GCS beat Chuffed on this family.
+
+## AAAI-26 benchmark rerun (2026-11-16, fataepyc-07, 1 h per run, 96 in parallel)
+
+`models/linear.mzn` (their formulation and symmetry breaking), `bench/`, raw results in
+`results/aaai_bench_2026-11-16.res`. Kissat 4.0.2 on THEIR CNF (construct_SAT.py SAT
+noopt DX SB, totalizer e6). Every SAT answer re-checked by lincheck.py: all have the
+target d.
+
+| solver | codes found / 51 | median time when found |
+|---|---|---|
+| Kissat (their CNF) | 29 | 119 s |
+| GCS | 11 | 252 s |
+| Chuffed | 6 | 25 s |
+| baguette + proof | 1 ((35,10,12), ~2 200 s incl. veripb, VERIFIED SATISFIABLE, 1.9 GB proof) | |
+
+The paper's Kissat (24 h, 1 core) found 38. Ours in 1 h: 29, consistent (their misses
+are all > 1 h or absent). Kissat's T values are close to theirs (same encoding, a
+different first solution). The 13 instances Kissat never solved stay unsolved by all.
+GCS is the best CP solver here, and finds some codes Kissat finds too but slower.
+Baguette: 50-77 k nodes in 1 h, 39 proofs cut by the time limit/memory are unparsable
+("error while parsing proof file"), 5 runs hit the 8 GB cap. This family is SAT-shaped
+(pure XOR + cardinality): the CP solvers lose here, as the paper found for CP-SAT.

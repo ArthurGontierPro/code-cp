@@ -34,6 +34,6 @@ if v: print('A = array2d(1..$((k*m)), [' + ', '.join('true' if i in s else 'fals
 esac
 t1=$(date +%s.%N)
 grep -q "UNSATISFIABLE\|^s UNSATISFIABLE" $O.log && st=UNSAT
-grep -q "A = array2d\|^s SATISFIABLE" $O.log && st=SAT
+grep -q "A = array2d\|^s SATISFIABLE\|^X_INTRODUCED_0_ = array1d" $O.log && st=SAT
 q=""; [ $st = SAT ] && q=$(python3 $B/scripts/lincheck.py $k $n < $O.log 2>&1)
 printf '%s n=%s k=%s d=%s status=%s wall=%.1f %s %s\n' $S $n $k $d $st $(echo "$t1 - $t0" | bc) "$q" "$extra" > $O.res
