@@ -20,7 +20,7 @@ case $S in
     v=$(timeout $TL ~/.cargo/bin/veripb $O.opb $O.pbp 2>&1 | grep -oE "VERIFIED [A-Z ]+|Checking error.*|error.*" | head -1)
     extra="pbp_MB=$(( ${pb:-0} / 1000000 )) veripb=\"$v\""; rm -f $O.pbp $O.opb $O.fzn ;;
   kissat)
-    cd $B/bench/out && mkdir -p cnf_$n_$k_$d.d && cd cnf_$n_$k_$d.d
+    cd $B/bench/out && mkdir -p cnf_${n}_${k}_${d}.d && cd cnf_${n}_${k}_${d}.d
     $TOOLS/venv/bin/python $B/external/AAAI-2026-Codes/Encodings/construct_SAT.py SAT noopt $n $k $d DX SB 6 > /dev/null 2>&1
     f=$(ls *.cnf | head -1)
     timeout $((TL+60)) $TOOLS/kissat/build/kissat --time=$TL -q $f > $O.log 2>&1
@@ -30,7 +30,7 @@ v=[int(x) for l in open('$O.log') if l.startswith('v') for x in l.split()[1:]]
 s=set(x for x in v if x>0)
 if v: print('A = array2d(1..$((k*m)), [' + ', '.join('true' if i in s else 'false' for i in range(1,$((k*m))+1)) + '])')
 " >> $O.log
-    cd ..; rm -rf cnf_$n_$k_$d.d ;;
+    cd ..; rm -rf cnf_${n}_${k}_${d}.d ;;
 esac
 t1=$(date +%s.%N)
 grep -q "UNSATISFIABLE\|^s UNSATISFIABLE" $O.log && st=UNSAT
