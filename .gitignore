@@ -1,0 +1,5 @@
+external/
+__pycache__/
+*.fzn
+*.opb
+*.pbp
