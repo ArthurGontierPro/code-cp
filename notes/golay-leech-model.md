@@ -295,3 +295,17 @@ What it suggests for baguette
 3. Our lazy distance (cegar.py + mindist.c) attacks their stated 2^k limitation; for
    non-self-dual codes the exact check needs the Brouwer-Zimmermann multiple
    information sets instead of our two-halves trick.
+
+### Lengths 72 and 96 under BDC (2026-11-16, 1800 s per run, launch_big.sh)
+
+| target | Chuffed (K=2,3) | GCS (K=2,3) | lazy (Chuffed, from K=1) |
+|---|---|---|---|
+| 72, d=12 | UNKNOWN | **K=2: SAT 179 s, exact d=12** | **round 1, 147 s, exact d=12** |
+| 72, d=16 | UNKNOWN | K=2: SAT 654 s but d=12 (relaxation) | round 1 d=12, 499 sets added, then stuck |
+| 96, d=16 | UNKNOWN | UNKNOWN | round 1 d=12, 47 sets added, then stuck |
+| 96, d=20 | UNKNOWN | UNKNOWN | round 1 d=12, 331 sets added, then stuck |
+
+K=4 at n=36 and GCS K=3 at n=48 died at the 8 GB cap during flattening/posting. A BDC
+[72,36,12] doubly-even self-dual code is found (one of Gulliver-Harada's 134). No UNSAT
+for d=16 at 72 (the expected, known answer): the eager model is too big, the lazy loop
+restarts from scratch each round. GCS beat Chuffed on this family.
