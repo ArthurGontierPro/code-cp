@@ -10,7 +10,7 @@ proofs). Started 2026-11-16 from baguette's `docs/ideas/` (Golay / q48 experimen
               node runners (`ch.sh` Chuffed/GCS, `bagq.sh` baguette + veripb).
               The runners assume the node layout `/scratch/arthur/golay` (to be moved).
 - `notes/`    `golay-leech-model.md` (ideas, results, bibliography, comparison with
-              the AAAI-26 paper), the paper PDF.
+              the AAAI-26 paper). The AAAI-26 paper PDF is kept locally only (not redistributed): https://github.com/veinamond/AAAI-2026-Codes
 - `external/` third-party code, NOT tracked: `AAAI-2026-Codes` cloned from
               https://github.com/veinamond/AAAI-2026-Codes at 4c5b8dc.
 - `results/`  run outputs worth keeping.
