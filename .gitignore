@@ -6,3 +6,7 @@ __pycache__/
 *.ozn
 *.pdf
 *:Zone.Identifier
+instances/
+results/runs/
+papers/
+mindist
