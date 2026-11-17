@@ -5,3 +5,4 @@ __pycache__/
 *.pbp
 *.ozn
 *.pdf
+*:Zone.Identifier

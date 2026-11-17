@@ -60,3 +60,47 @@ exist for k ≥ 2 (Harada–Miezaki, built from Γ72). Z4 at length 72 is open.
 - Harada–Miezaki Z_{2k}: https://arxiv.org/abs/1205.6947 , Harada: https://arxiv.org/abs/2201.01439
 - Watkins dim 80: https://www.numdam.org/articles/10.5802/jtnb.795/
 - Nebe's lattice catalogue (Gram matrices!): https://www.math.rwth-aachen.de/~Gabriele.Nebe/LATTICES/
+
+## Reading notes (2026-11-17, from the downloaded PDFs, kept local and untracked)
+
+### Stehlé–Watkins, extremality of N80 (ANTS-IX 2010)
+- Shape of an extremality proof. Θ lies in a space of modular forms of dimension 4, with a
+  triangular basis f0..f3, so Θ = f0 + a1 f1 + a2 f2 + a3 f3. "No norm 2 or 4" gives a1 = a2 = 0.
+  Then a3 ≥ 0 by positivity, and EXHIBITING 7.5·10^12 norm-10 vectors (15.3 M orbits under
+  SL2(79)) forces a3 = 0. The hard UNSAT part (norm 6) is replaced by a SAT part (a witness
+  set that is cheap to check). The checker runs in 10 h, against 4 days × 14 cores to find it.
+- Norm 2 directly takes under 30 min. Norm 4 directly would take "a few months". They bypass it
+  through a doubly-even self-dual BINARY code C2 (it is the extended QR code of length 80, d=16)
+  and lift its weight-16 words by hand. Proving that code has d > 20 directly is estimated at
+  58 days. This is exactly our code models' problem.
+- Enumeration is Kannan–Fincke–Pohst with Schnorr–Euchner zig-zag, pruning, and basis
+  re-randomisation. Orbit canonical forms use lex order after moving the two largest coordinates.
+
+### Bachoc–Nebe, minimum 8 and M22 (Crelle 1998)
+- In 1998, "algorithms to compute the minimum are limited to dimensions around 60".
+- L80 and M80 have minimum 8 proved through a construction from a (10,5,4) binary code over
+  the lattices Z[α], A2⊗A2, E8. The lattice minimum becomes a WEIGHT on the code (Def. 4.2,
+  Lemma 4.3), i.e. lattice minimum = code distance for a nonstandard weight. Codes again
+  replace enumeration.
+
+### SPLAG (Conway–Sloane, 3rd ed.)
+- Ch. 7 §7: extremal Type II bounds d ≤ 4⌊n/24⌋+4 for codes and μ ≤ 2⌊n/24⌋+2 for lattices.
+  Extremal theta series: 48 → 1 + 52 416 000 q^6, 72 → 1 + 6 218 175 600 q^8.
+  The binary [72,36,16] Type II code is "the first open case". It is STILL open (Nebe and others
+  have reduced the possible automorphism groups to very small ones).
+- Ch. 5 §5.4–5.7: P48p and P48q come from TERNARY [48,24,15] codes (Pless double circulant
+  and extended QR) by Construction B3, then density doubling with the translate
+  (−5/2, 1/2^47) (scaled). Table 5.3 gives the 52 416 000 minimal vectors by shape.
+- Construction A4 from Z4 codes also gives Leech (ch. 4 notes).
+
+## Consequences for the roadmap
+- R3 is more central than I thought. In every known proof, extremality at 48 and 80 goes
+  through a CODE (binary or ternary), because direct enumeration does not scale. So our code
+  models are the right tool. The natural targets are:
+  (a) the binary Type II [72,36,16] code, open for 50 years (our model at q72, which we ran
+      under BDC; the literature already excludes most automorphism groups);
+  (b) ternary extremal self-dual codes [72,36,21], also open, which via B3 + doubling
+      is the analogue of how P48p/q come from [48,24,15]. Our model generalises to F3.
+- R0/R2 certificate: reproduce Leech "no norm 2" and P48 "no norm ≤ 4" as VeriPB proofs.
+  The Stehlé–Watkins shape (a cheap witness set + a modular-form identity) is a template for
+  checkable proofs that do not need full UNSAT enumeration.
