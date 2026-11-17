@@ -75,27 +75,60 @@ minimaux. **Prouver qu'un réseau est extrémal revient donc à prouver qu'un ce
 vecteurs courts est vide.** C'est exactement le genre de question qu'un solveur de contraintes sait
 traiter, avec une réponse UNSAT.
 
-## 4. Les codes correcteurs
+## 4. Les codes correcteurs, sur un exemple qu'on suivra jusqu'au bout
 
-Un code binaire linéaire de longueur n est un sous-espace C de F_2^n (des mots de n bits, stable par
-XOR). Le **poids** d'un mot est son nombre de 1. La **distance minimale** d est le plus petit poids
-d'un mot non nul. On note [n, k, d] un code de dimension k.
+**À quoi sert un code.** On veut envoyer 4 bits sur un canal bruité, où un bit peut s'inverser. On
+envoie plutôt 8 bits, choisis de sorte que deux messages envoyables diffèrent toujours en au moins 4
+positions. Si un seul bit est inversé en route, le mot reçu reste plus proche du mot envoyé que de tout
+autre, et on corrige l'erreur. L'ensemble des mots envoyables s'appelle un **code**.
 
-Les codes qui nous intéressent sont les analogues des réseaux pairs unimodulaires :
+**L'exemple fil rouge : le code de Hamming étendu.** On part de 4 bits de message u = (u1, u2, u3, u4)
+et on calcule 4 bits de contrôle en multipliant par une matrice A (les calculs sont modulo 2, donc
+1 + 1 = 0, c'est le XOR) :
 
-- **auto-dual** (C = C⊥, tout couple de mots a un produit scalaire nul modulo 2), l'analogue
-  d'unimodulaire ;
-- **doublement pair** (tous les poids sont multiples de 4), l'analogue de pair.
+    G = [ I | A ] = 1 0 0 0 | 0 1 1 1        mot envoyé = (u, u·A)
+                    0 1 0 0 | 1 0 1 1
+                    0 0 1 0 | 1 1 0 1
+                    0 0 0 1 | 1 1 1 0
 
-La même théorie (des polynômes invariants à la place des formes modulaires) donne la borne
-d ≤ 4 ⌊n/24⌋ + 4, et un code qui l'atteint est extrémal. Le code de Golay [24, 12, 8] est le code
-extrémal de longueur 24. Il est unique, et c'est le cousin du réseau de Leech. À la longueur 48, le
-code QR48 [48, 24, 12] est extrémal. À la longueur 72, l'existence d'un code [72, 36, 16] est **un
-problème ouvert depuis 1973**.
+Chaque mot du code est une somme (XOR) de lignes de G. Quelques exemples :
 
-On écrit un tel code sous forme systématique, avec une matrice génératrice G = [I | A]. Un mot du code
-s'obtient en choisissant un ensemble S de lignes et en les additionnant. Son poids vaut |S| plus le
-poids du XOR des lignes de A choisies.
+| lignes choisies S | partie gauche (= u) | partie droite (XOR des lignes de A) | poids |
+|---|---|---|---|
+| {1} | 1000 | 0111 | 1 + 3 = 4 |
+| {1, 2} | 1100 | 0111 ⊕ 1011 = 1100 | 2 + 2 = 4 |
+| {1, 2, 3} | 1110 | 1100 ⊕ 1101 = 0001 | 3 + 1 = 4 |
+| {1, 2, 3, 4} | 1111 | 0001 ⊕ 1110 = 1111 | 4 + 4 = 8 |
+
+On voit sur ce tableau la formule utilisée partout dans nos modèles, c'est-à-dire que le **poids**
+(le nombre de 1) d'un mot vaut |S| plus le poids du XOR des lignes de A choisies. Si on énumère les
+16 choix de S, on trouve le mot nul, 14 mots de poids 4 et un mot de poids 8 (tout à 1). On résume ça
+par l'**énumérateur des poids** 1 + 14 x⁴ + x⁸.
+
+**La notation [n, k, d].** C'est la carte d'identité d'un code linéaire.
+
+- n est la **longueur** des mots, ici 8 ;
+- k est la **dimension**, le nombre de bits de message, ici 4. Le code a 2^k = 16 mots ;
+- d est la **distance minimale**, le plus petit poids d'un mot non nul, ici 4. Comme le code est
+  stable par XOR, la distance entre deux mots est le poids de leur XOR, donc d est aussi la plus petite
+  distance entre deux mots distincts. Un code de distance d corrige ⌊(d−1)/2⌋ erreurs.
+
+Notre exemple est donc un code **[8, 4, 4]**. On veut d grand pour n et k donnés, mais les deux
+s'opposent. Plus il y a de mots, moins ils peuvent être éloignés les uns des autres. C'est exactement la
+même tension que pour les sphères, où on veut beaucoup de centres et une grande distance entre eux.
+
+**Les deux propriétés qui comptent pour nous.** Notre exemple les a toutes les deux.
+
+- **Auto-dual.** Deux mots quelconques du code ont un produit scalaire pair (ils ont un nombre pair
+  de 1 en commun), et le code est le plus grand possible avec cette propriété (k = n/2). Par exemple
+  10000111 et 01001011 ont deux 1 en commun. Sur la matrice, cela se lit A·Aᵀ = I.
+- **Doublement pair.** Tous les poids sont multiples de 4. C'est le cas ici (0, 4 et 8).
+
+**La version code du problème de départ.** Pour ces codes, la même théorie que celle de la section 3
+(avec des polynômes invariants à la place des formes modulaires) donne la borne d ≤ 4 ⌊n/24⌋ + 4. Notre
+[8, 4, 4] l'atteint. Le code de Golay [24, 12, 8] est le code extrémal de longueur 24. Il est unique, et
+c'est le cousin du réseau de Leech. À la longueur 48, le code QR48 [48, 24, 12] est extrémal. À la
+longueur 72, l'existence d'un code [72, 36, 16] est **un problème ouvert depuis 1973**.
 
 ## 5. Le pont entre codes et réseaux
 
@@ -104,11 +137,31 @@ donnent un mot de C. C'est la **construction A**.
 
     A(C) = { x ∈ Z^n : x mod 2 ∈ C },   avec la norme x·x / 2.
 
-Exemple. Le code de Hamming étendu [8, 4, 4] donne exactement E8. Les vecteurs de norme 2 sont de deux
-sortes, ±2e_i (car 2e_i ≡ 0 mod 2, et 0 est un mot du code), et les mots de poids 4 avec des signes ±1.
+**Suite de l'exemple fil rouge.** Appliquée au code [8, 4, 4] de la section 4, la construction A donne
+exactement E8, le meilleur empilement de la dimension 8. Comptons les vecteurs de norme 2, c'est-à-dire
+les x entiers avec x·x = 4. Il y en a de deux sortes.
 
-Le problème est que ±2e_i est toujours là et a toujours une norme 4/2 = 2. La construction A ne peut
-donc jamais dépasser le minimum 2, ce qui suffit en dimension 8 mais pas en dimension 24. Pour Leech,
+- Un ±1 sur chacune des 4 positions d'un mot de poids 4, et des 0 ailleurs. Réduit modulo 2, c'est le
+  mot de code, donc x est dans le réseau. Il y a 14 mots de poids 4 et 2⁴ = 16 choix de signes, ce qui
+  fait 224 vecteurs.
+- ±2 sur une seule position. Réduit modulo 2, c'est le mot nul, qui est dans le code. Cela fait
+  2 × 8 = 16 vecteurs.
+
+On retrouve les 224 + 16 = 240 voisins de chaque boule dans E8. Le dictionnaire entre les deux mondes
+se lit directement sur cet exemple.
+
+| côté code | côté réseau (construction A) | sur l'exemple |
+|---|---|---|
+| mot de code c | vecteurs x ≡ c (mod 2) | 10000111 donne (1,0,0,0,0,1,1,1) et ses variantes de signe |
+| poids w d'un mot 0/1 | norme w/2 | poids 4 donne norme 2 |
+| distance minimale d | minimum min(d/2, 2) | d = 4 donne minimum 2 |
+| auto-dual | unimodulaire | E8 est unimodulaire |
+| doublement pair | pair | E8 est pair |
+| énumérateur des poids | série thêta | 1 + 14x⁴ + x⁸ donne 1 + 240q + … |
+
+Le problème se voit dans la ligne « minimum min(d/2, 2) » du dictionnaire. Les vecteurs ±2e_i sont
+toujours là, et ont toujours une norme 4/2 = 2. La construction A ne peut donc jamais dépasser le
+minimum 2, ce qui suffit en dimension 8 mais pas en dimension 24. Pour Leech,
 on ajoute deux étapes :
 
 1. la **construction B**, qui ne garde que les x dont la somme des coordonnées est multiple de 4. Cela
@@ -129,8 +182,11 @@ On pose trois sortes de questions à un solveur de contraintes (Chuffed, GCS, ba
 
 - **Trouver** (réponse SAT). Par exemple, « trouve un code auto-dual doublement pair de longueur 48 et
   de distance 12 ». Le solveur rend le code, qu'on vérifie indépendamment en calculant sa distance.
-- **Prouver qu'il n'y a rien** (réponse UNSAT). Par exemple, « trouve un vecteur non nul de norme 2 dans
-  le réseau de Leech ». Le modèle `models/shortvec.mzn` a pour variables le mot de code (u), le
+- **Prouver qu'il n'y a rien** (réponse UNSAT). Sur l'exemple fil rouge, on demande « un mot non nul de
+  poids ≤ 3 dans le code [8, 4, 4] ». Les variables sont les 4 bits u, et les contraintes calculent
+  u·A puis bornent le poids total. Le solveur répond UNSAT, ce qui prouve d ≥ 4. C'est exactement le
+  modèle `models/minweight.mzn`, avec QR48 ou QR80 à la place du code de Hamming. Un autre exemple est « trouve un vecteur non nul de norme 2
+  dans le réseau de Leech ». Le modèle `models/shortvec.mzn` a pour variables le mot de code (u), le
   décalage (b ∈ {0,1}) et les coordonnées (w). Ses contraintes disent que w appartient au réseau et
   que w·w ≤ 2·8. Si le solveur répond UNSAT, Leech n'a pas de vecteur de norme 2.
 - **Certifier**. Un solveur est un programme de plusieurs dizaines de milliers de lignes, et il peut
@@ -154,7 +210,10 @@ Ce qui reste admis, et qu'on signale à chaque fois dans le tableau :
 ## 7. Deux idées qui changent tout
 
 **L'argument des deux moitiés.** Dans un code auto-dual écrit [I | A], la matrice A est inversible
-(A·Aᵀ = I), donc le même code s'écrit aussi [Aᵀ | I]. Un mot de poids au plus 12 a au plus 6 uns sur
+(A·Aᵀ = I), donc le même code s'écrit aussi [Aᵀ | I]. Sur l'exemple fil rouge, un mot de poids ≤ 3 a au
+plus un 1 à gauche ou au plus un 1 à droite. À gauche, cela veut dire une seule ligne de G, et les quatre
+lignes ont un poids 4. À droite, c'est la même chose avec [Aᵀ | I]. Huit vérifications suffisent au
+lieu de seize. En longueur 80, l'écart devient énorme. Un mot de poids au plus 12 a au plus 6 uns sur
 sa moitié gauche, ou au plus 6 uns sur sa moitié droite. On lance donc deux instances, une avec A et une
 avec Aᵀ, chacune limitée à 6 lignes choisies. L'effet est énorme. Pour QR80, le solveur sans découpage
 n'avait pas conclu après une heure, et avec le découpage il conclut en 9 minutes par moitié. Les
