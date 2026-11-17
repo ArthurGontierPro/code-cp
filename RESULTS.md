@@ -78,8 +78,8 @@ traiter, avec une réponse UNSAT.
 ## 4. Les codes correcteurs, sur un exemple qu'on suivra jusqu'au bout
 
 **À quoi sert un code.** On veut envoyer 4 bits sur un canal bruité, où un bit peut s'inverser. On
-envoie plutôt 8 bits, choisis de sorte que deux messages envoyables diffèrent toujours en au moins 4
-positions. Si un seul bit est inversé en route, le mot reçu reste plus proche du mot envoyé que de tout
+envoie plutôt 8 bits, choisis de sorte que deux messages envoyables diffèrent toujours sur au moins 4
+bits. Si un seul bit est inversé en route, le mot reçu reste plus proche du mot envoyé que de tout
 autre, et on corrige l'erreur. L'ensemble des mots envoyables s'appelle un **code**.
 
 **L'exemple fil rouge : le code de Hamming étendu.** On part de 4 bits de message u = (u1, u2, u3, u4)
@@ -100,8 +100,12 @@ Chaque mot du code est une somme (XOR) de lignes de G. Quelques exemples :
 | {1, 2, 3} | 1110 | 1100 ⊕ 1101 = 0001 | 3 + 1 = 4 |
 | {1, 2, 3, 4} | 1111 | 0001 ⊕ 1110 = 1111 | 4 + 4 = 8 |
 
-On voit sur ce tableau la formule utilisée partout dans nos modèles, c'est-à-dire que le **poids**
-(le nombre de 1) d'un mot vaut |S| plus le poids du XOR des lignes de A choisies. Si on énumère les
+Un peu de vocabulaire. Un mot est une suite de n bits, et sa **coordonnée i** est son i-ème bit. Le
+**support** d'un mot est l'ensemble des coordonnées où il vaut 1. Par exemple le mot 10000111 a pour
+support {1, 6, 7, 8}. Le **poids** d'un mot est la taille de son support, c'est-à-dire son nombre de 1.
+
+On voit sur ce tableau la formule utilisée partout dans nos modèles, c'est-à-dire que le poids d'un mot
+vaut |S| plus le poids du XOR des lignes de A choisies. Si on énumère les
 16 choix de S, on trouve le mot nul, 14 mots de poids 4 et un mot de poids 8 (tout à 1). On résume ça
 par l'**énumérateur des poids** 1 + 14 x⁴ + x⁸.
 
@@ -132,42 +136,62 @@ longueur 72, l'existence d'un code [72, 36, 16] est **un problème ouvert depuis
 
 ## 5. Le pont entre codes et réseaux
 
-À partir d'un code C, on fabrique un réseau en prenant tous les vecteurs entiers qui, réduits modulo 2,
-donnent un mot de C. C'est la **construction A**.
+**Les objets.** Côté réseau, on manipule des vecteurs x = (x_1, …, x_n) dont les n **coordonnées** x_i
+sont des entiers (on écrit x ∈ Z^n). Côté code, on manipule des mots de n bits. On passe d'un vecteur à
+un mot en **réduisant chaque coordonnée modulo 2**, c'est-à-dire en remplaçant chaque x_i par son reste
+dans la division par 2 (0 si x_i est pair, 1 s'il est impair). Par exemple le vecteur (3, 0, −1, 2)
+se réduit en le mot 1010. On note e_i le vecteur qui a un 1 à la coordonnée i et des 0 ailleurs.
 
-    A(C) = { x ∈ Z^n : x mod 2 ∈ C },   avec la norme x·x / 2.
+**La construction A.** À partir d'un code C de longueur n, on garde tous les vecteurs à coordonnées
+entières dont la réduction modulo 2 est un mot de C :
+
+    A(C) = { x ∈ Z^n : (x_1 mod 2, …, x_n mod 2) ∈ C }.
+
+C'est bien un réseau, puisque la somme de deux tels vecteurs se réduit en la somme (XOR) de deux mots du
+code, qui est encore dans le code. On garde les coordonnées entières pour calculer facilement, mais on
+mesure la norme d'un vecteur de A(C) par x·x / 2, c'est-à-dire la somme des x_i² divisée par 2. Ce
+facteur 1/2 revient à rétrécir tout le réseau d'un facteur √2, et c'est ce rétrécissement qui le rend
+unimodulaire quand le code est auto-dual.
 
 **Suite de l'exemple fil rouge.** Appliquée au code [8, 4, 4] de la section 4, la construction A donne
-exactement E8, le meilleur empilement de la dimension 8. Comptons les vecteurs de norme 2, c'est-à-dire
-les x entiers avec x·x = 4. Il y en a de deux sortes.
+exactement E8, le meilleur empilement de la dimension 8. Comptons les vecteurs de E8 de norme 2,
+c'est-à-dire les vecteurs x de A(C) tels que x_1² + … + x_8² = 4. Une somme de huit carrés d'entiers ne
+vaut 4 que de deux façons, quatre coordonnées égales à ±1 (et les autres nulles), ou une coordonnée
+égale à ±2 (et les autres nulles).
 
-- Un ±1 sur chacune des 4 positions d'un mot de poids 4, et des 0 ailleurs. Réduit modulo 2, c'est le
-  mot de code, donc x est dans le réseau. Il y a 14 mots de poids 4 et 2⁴ = 16 choix de signes, ce qui
-  fait 224 vecteurs.
-- ±2 sur une seule position. Réduit modulo 2, c'est le mot nul, qui est dans le code. Cela fait
-  2 × 8 = 16 vecteurs.
+- Quatre coordonnées à ±1. La réduction modulo 2 de x est le mot qui vaut 1 sur ces quatre
+  coordonnées. Le vecteur x est donc dans le réseau exactement quand ce mot de poids 4 est un mot du
+  code, c'est-à-dire quand les quatre coordonnées forment le support d'un des 14 mots de poids 4. Pour
+  chacun, on choisit librement les 4 signes, soit 2⁴ = 16 choix. Cela fait 14 × 16 = 224 vecteurs.
+  Par exemple, le mot 10000111 donne (1, 0, 0, 0, 0, 1, 1, 1), (−1, 0, 0, 0, 0, 1, 1, 1), et ainsi
+  de suite.
+- Une coordonnée à ±2. C'est le vecteur ±2e_i. Sa réduction modulo 2 est le mot nul, qui est toujours
+  dans le code. Cela fait 2 × 8 = 16 vecteurs.
 
 On retrouve les 224 + 16 = 240 voisins de chaque boule dans E8. Le dictionnaire entre les deux mondes
 se lit directement sur cet exemple.
 
 | côté code | côté réseau (construction A) | sur l'exemple |
 |---|---|---|
-| mot de code c | vecteurs x ≡ c (mod 2) | 10000111 donne (1,0,0,0,0,1,1,1) et ses variantes de signe |
-| poids w d'un mot 0/1 | norme w/2 | poids 4 donne norme 2 |
-| distance minimale d | minimum min(d/2, 2) | d = 4 donne minimum 2 |
+| un mot de code c | les vecteurs x dont la réduction modulo 2 vaut c | le mot 10000111 donne (1,0,0,0,0,1,1,1) et ses variantes de signe |
+| un mot de poids w | le vecteur à coordonnées 0 et 1 qui le recopie, de norme w/2 | poids 4 donne norme 2 |
+| distance minimale d | minimum égal à min(d/2, 2) | d = 4 donne minimum 2 |
 | auto-dual | unimodulaire | E8 est unimodulaire |
 | doublement pair | pair | E8 est pair |
 | énumérateur des poids | série thêta | 1 + 14x⁴ + x⁸ donne 1 + 240q + … |
 
-Le problème se voit dans la ligne « minimum min(d/2, 2) » du dictionnaire. Les vecteurs ±2e_i sont
-toujours là, et ont toujours une norme 4/2 = 2. La construction A ne peut donc jamais dépasser le
-minimum 2, ce qui suffit en dimension 8 mais pas en dimension 24. Pour Leech,
-on ajoute deux étapes :
+Le problème se voit dans la ligne « minimum égal à min(d/2, 2) » du dictionnaire. Les vecteurs ±2e_i
+sont toujours dans A(C), quel que soit le code, et ont toujours une norme 4/2 = 2. La construction A ne
+peut donc jamais dépasser le minimum 2, ce qui suffit en dimension 8 mais pas en dimension 24. Pour
+Leech, on part du code de Golay et on ajoute deux étapes. Les vecteurs ont alors des coordonnées entières
+et une norme égale à x·x / 8, c'est-à-dire qu'on rétrécit cette fois d'un facteur √8.
 
-1. la **construction B**, qui ne garde que les x dont la somme des coordonnées est multiple de 4. Cela
-   élimine les ±2e_i. Le réseau obtenu a un minimum plus grand, mais il est deux fois trop peu dense ;
-2. on double la densité en ajoutant un **translaté**, c'est-à-dire une seconde copie du réseau décalée
-   par le vecteur (−3, 1, 1, …, 1)/√8.
+1. la **construction B**. Parmi les vecteurs y de la construction A, on ne garde que ceux dont la
+   somme des coordonnées y_1 + … + y_n est multiple de 4, puis on les multiplie par 2. Le vecteur 2e_i
+   a pour somme 2, donc il disparaît. Le réseau obtenu a un minimum de 4, mais il a deux fois trop peu
+   de points par unité de volume pour être unimodulaire ;
+2. on double la densité en ajoutant un **translaté**, c'est-à-dire une seconde copie du même réseau
+   décalée du vecteur (−3, 1, 1, …, 1). Ce vecteur a pour norme (9 + 23)/8 = 4.
 
 Partir du code de Golay donne alors le réseau de Leech. Pour P48p et P48q, c'est la même recette, mais
 sur des codes **ternaires** (modulo 3) [48, 24, 15], suivie elle aussi d'un doublement de densité.
