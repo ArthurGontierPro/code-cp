@@ -16,6 +16,7 @@ array[1..k, 1..m] of 0..1: A;
 int: Wmax;                                % passer -D "Wmax=4;"
 int: HALF;                                % au plus HALF lignes choisies (HALF = k : aucune restriction)
 int: FIRST;                               % 0 : rien ; i > 0 : la première ligne choisie est la ligne i
+int: SECOND;                              % 0 : rien ; -1 : la ligne FIRST est seule ; j > FIRST : la 2e ligne choisie est j
 %  FIRST découpe encore chaque moitié en k cas disjoints (u_1 = … = u_{i-1} = 0, u_i = 1). Les k
 %  cas recouvrent tous les u non nuls, donc k UNSAT valent un UNSAT ; on les lance en parallèle.
 %  Argument des deux moitiés (celui de scripts/mindist.c). Si A·Aᵀ = I (code auto-dual), le
@@ -39,6 +40,8 @@ constraint forall(j in 1..m)(
 constraint sum(i in 1..k)(bool2int(u[i])) >= 1;
 constraint sum(i in 1..k)(bool2int(u[i])) <= HALF;
 constraint if FIRST > 0 then u[FIRST] /\ forall(i in 1..FIRST-1)(not u[i]) else true endif;
+constraint if SECOND = -1 then forall(i in FIRST+1..k)(not u[i])
+           elseif SECOND > 0 then u[SECOND] /\ forall(i in FIRST+1..SECOND-1)(not u[i]) else true endif;
 constraint sum(i in 1..k)(bool2int(u[i])) + sum(j in 1..m)(bool2int(c[j])) <= Wmax;
 
 solve satisfy;
