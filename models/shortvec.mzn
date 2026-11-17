@@ -22,6 +22,14 @@ int: N;  int: k;  int: p;  int: Q;  int: D;
 array[1..N] of int: T;
 array[1..k, 1..N] of 0..p-1: G;
 int: M;                                   % norme maximale cherchée (passer -D "M=2;")
+int: BFIX;                                % -1 : b libre ; 0 ou 1 : b fixé (découpage en cas)
+int: HALF;                                % au plus HALF coordonnées u_j non nulles (HALF = k : libre)
+%  Découpage en cas pour P48 (fichiers p48X_L.dzn et p48X_R.dzn, voir gen_instances.py) :
+%    b = 0 : w = 2y, w·w ≤ 48 donne y·y ≤ 12, donc le mot de code y mod 3 a au plus 12
+%            coordonnées non nulles, donc au plus 6 sur une des deux moitiés. G est sous forme
+%            systématique [I|A] (fichier _L) ou [I|-Aᵀ] (fichier _R, moitiés échangées), et
+%            HALF = 6 borne la moitié choisie. Deux UNSAT couvrent tout le cas b = 0.
+%    b = 1 : toutes les w_i sont impaires, donc w·w ≤ 48 force w_i = ±1 ; un seul run, HALF = k.
 
 int: W = floor(sqrt(int2float(M * D)));   % |w_i| ≤ W puisque w_i² ≤ w·w ≤ M·D
 int: tmax = max([abs(t) | t in T]);
@@ -29,6 +37,8 @@ int: Y = (W + tmax) div 2 + 1;           % |y_i| ≤ Y
 
 array[1..k] of var 0..p-1: u;             % le mot de code est u·G mod p
 var 0..1: b;                              % b = 1 : on est dans le translaté
+constraint if BFIX >= 0 then b = BFIX else true endif;
+constraint sum(j in 1..k)(bool2int(u[j] > 0)) <= HALF;
 array[1..N] of var -Y..Y: y;
 array[1..N] of var -W..W: w;
 array[1..N] of var 0..W*W: sq;

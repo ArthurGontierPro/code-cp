@@ -120,6 +120,10 @@ def main(out):
         k = len(A)
         with open(f"{out}/{name}.dzn", "w") as f:
             f.write(f"k = {k};\nm = {len(A[0])};\n" + dzn_array2("A", A))
+        AT = [list(r) for r in zip(*A)]
+        assert all(sum(A[i][l] * AT[l][j] for l in range(k)) % 2 == int(i == j) for i in range(k) for j in range(k))
+        with open(f"{out}/{name}_T.dzn", "w") as f:
+            f.write(f"k = {k};\nm = {k};\n" + dzn_array2("A", AT))
         with open(f"{out}/{name}.bits", "w") as f:   # for scripts/mindist.c
             f.write("".join(str(x) for r in A for x in r) + "\n")
         print(f"{name}: [{2*k},{k}] doubly-even self-dual, systematic form written")
@@ -138,6 +142,16 @@ def main(out):
         T = [-5 * s[0]] + s[1:]
         assert span_contains(G, [t % 3 for t in T], 3) and sum(T) % 2 == 0
         lat(name, G, 3, 2, T, 12)
+        # systematic versions for the two-halves split (columns permuted, T permuted with them)
+        A, perm = systematic(G, 3); k = len(A)
+        T1 = [T[c] for c in perm]
+        G1 = [[int(i == j) for j in range(k)] + A[i] for i in range(k)]
+        AT = [[(-A[j][i]) % 3 for j in range(k)] for i in range(k)]
+        assert all(sum(A[i][l] * AT[l][j] for l in range(k)) % 3 == int(i == j) for i in range(k) for j in range(k))
+        G2 = [[int(i == j) for j in range(k)] + AT[i] for i in range(k)]
+        T2 = T1[k:] + T1[:k]
+        lat(name + "_L", G1, 3, 2, T1, 12)
+        lat(name + "_R", G2, 3, 2, T2, 12)
 
 if __name__ == "__main__":
     main(sys.argv[1] if len(sys.argv) > 1 else "instances")

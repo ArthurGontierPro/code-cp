@@ -14,6 +14,12 @@
 int: k;  int: m;
 array[1..k, 1..m] of 0..1: A;
 int: Wmax;                                % passer -D "Wmax=4;"
+int: HALF;                                % au plus HALF lignes choisies (HALF = k : aucune restriction)
+%  Argument des deux moitiés (celui de scripts/mindist.c). Si A·Aᵀ = I (code auto-dual), le
+%  même code s'écrit aussi [Aᵀ | I] : un mot (u, c) avec c = u·A vérifie u = c·Aᵀ. Un mot de
+%  poids ≤ Wmax a au plus Wmax/2 uns à gauche OU à droite. On lance donc deux instances,
+%  « golay24.dzn » et « golay24_T.dzn » (A transposée) avec HALF = Wmax div 2 : deux UNSAT
+%  prouvent qu'aucun mot de poids ≤ Wmax n'existe. Chaque cas est bien plus petit.
 
 array[1..k] of var bool: u;
 array[1..m] of var bool: c;               % partie redondante du mot
@@ -28,6 +34,7 @@ constraint forall(j in 1..m)(
   c[j] = acc[r]);
 
 constraint sum(i in 1..k)(bool2int(u[i])) >= 1;
+constraint sum(i in 1..k)(bool2int(u[i])) <= HALF;
 constraint sum(i in 1..k)(bool2int(u[i])) + sum(j in 1..m)(bool2int(c[j])) <= Wmax;
 
 solve satisfy;
