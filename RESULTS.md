@@ -208,36 +208,75 @@ Le nœud fataepyc-07 a 192 cœurs, donc tout ce qui est marqué ⏳ dans un mêm
 | A7 | benchmark AAAI-26 (51 codes linéaires) | linear.mzn | ✅ | Kissat 29/51 en 1 h, GCS 11, Chuffed 6, baguette 1 | sur ce type de problème, le SAT pur domine nos modèles CP. |
 | A8 | bug de `--time-limit` de baguette | dbg/ sur le nœud | ✅ | baguette dépasse sa limite d'environ 8 %, mais ses preuves sont complètes | les preuves illisibles venaient de notre timeout extérieur. Demande déposée dans WORKLOG. |
 
-## B. Plan A, certifier des résultats connus (preuves VeriPB, jamais certifiés à ce jour)
+## B. Plan A, certifier des résultats connus
 
-Chaque ligne est un UNSAT. Une preuve acceptée par VeriPB donne une vérification indépendante d'un résultat publié.
-On lance chaque instance avec GCS, baguette et Kissat (DRAT) pour comparer, et chaque désaccord est un bug à chercher.
+Chaque ligne est un UNSAT. Une preuve acceptée par VeriPB donne une vérification indépendante d'un résultat
+publié (à notre connaissance, aucun de ces résultats n'avait de certificat). Les chiffres détaillés par
+solveur sont dans le tableau B-détail plus bas. ✔︎ veut dire « preuve vérifiée par VeriPB ».
 
 | id | question | méthode | statut | résultat | ce que ça veut dire |
 |---|---|---|---|---|---|
-| B1 | Leech n'a aucun vecteur de norme 2 | Gram de Leech fixé, x entier borné par la diagonale de G⁻¹, xᵀGx = 2 | ⏳ | | premier certificat de la propriété qui fait de Leech un réseau extrémal. Il valide la chaîne de preuve sur les réseaux. |
-| B2 | le code de Golay a une distance de 8, et non 4 | code fixé, recherche d'un mot de poids 4 | ⏳ | | même chose côté codes. C'est un test facile. |
-| B3 | QR48 a une distance de 12 | idem | ⏳ | | certifie le code qui donne les réseaux extrémaux de dimension 48 par codes. |
-| B4 | QR80 a une distance de 16 | idem | ⏳ | | c'est le code qu'utilisent Stehlé et Watkins pour prouver que N80 est extrémal. |
-| B5 | P48p et P48q n'ont aucun vecteur de norme 2 ou 4 | Gram (catalogue de Nebe), énumération bornée | ⏳ | | certifierait l'extrémalité d'un réseau de dimension 48 (le minimum 6 suit). C'est la limite de l'énumération directe, on mesurera jusqu'où ça passe. |
-| B6 | un [72,36,16] n'a pas d'automorphisme d'ordre 7 (Nebe 2012) | code invariant sous σ d'ordre 7, découpage en cas de l'article | ⏳ | | première vérification indépendante d'une exclusion publiée, qui n'existait jusqu'ici que comme calcul Magma. |
-| B7 | idem pour Z3×Z3, D10, l'ordre 6, Z4, et Z2×Z2×Z2 | même schéma, un modèle par groupe | ⏳ | | certifie la liste des groupes encore possibles (ordre 1, 2, 3, 5, ou Z2×Z2). |
-| B8 | non-existence de petits codes linéaires (40,8,17), (35,10,13) | linear.mzn | ⏳ | | permet de comparer les preuves VeriPB aux preuves DRAT sur des résultats connus. C'est l'angle de l'article AAAI. |
+| B1 | Leech n'a aucun vecteur de norme 2 | `shortvec.mzn`, Leech = construction B du code de Golay + translaté, w·w ≤ 16 | ✅ ✔︎ | baguette 4,5 min, preuve 313 Mo vérifiée en 24 s. GCS 5 min, preuve 35 Go vérifiée en 40 min. | Leech est extrémal, avec un certificat. C'est le minimum 4 qui fait de lui le meilleur empilement en dimension 24. |
+| B2 | Golay n'a aucun mot de poids 4 | `minweight.mzn`, code fixé | ✅ ✔︎ | moins d'une seconde pour tous les solveurs, preuves de quelques Mo | Golay a bien une distance de 8. |
+| B3 | QR48 n'a aucun mot de poids ≤ 8 | `minweight.mzn`, puis découpage en deux moitiés | ✅ ✔︎ | sans découpage, preuve GCS de 32 Go. Avec découpage, 2 × 3 s et 2 × 360 Mo (GCS), 2 × 2,5 min et 2 × 143 Mo (baguette). | QR48 a une distance de 12, c'est le code extrémal de longueur 48. |
+| B3b | QR72 n'a aucun mot de poids ≤ 8 | idem | ✅ ✔︎ | sans découpage, la preuve GCS dépasse 200 Go. Avec découpage, GCS 2 × 35 s et 2 × 4 Go, baguette 2 × 66 min et 2 × 1 Go. | distance ≥ 12 (QR72 n'est pas extrémal, il lui faudrait 16). Sert d'échelon de difficulté. |
+| B4 | QR80 n'a aucun mot de poids ≤ 12 | idem | 🔄 | sans découpage, rien en 1 h. Avec découpage, UNSAT en 9 min (Chuffed) et 12 min (GCS) par moitié. La preuve GCS dépasse 200 Go, et baguette tourne encore. | QR80 a une distance de 16. C'est le code qu'utilisent Stehlé et Watkins pour le réseau N80. Pas encore certifié. |
+| B4b | QR104 n'a aucun mot de poids ≤ 16 | idem | ❌ | UNKNOWN en 1 h, même avec découpage | c'est la limite actuelle du modèle CP. Le programme dédié `mindist` règle les quatre codes précédents en moins d'une seconde. |
+| B5 | P48q n'a aucun vecteur de norme ≤ 4 | `shortvec.mzn`, découpage en trois cas (voir l'en-tête du modèle) | 🔄 | UNSAT par Chuffed dans les trois cas (19 min, 16 min, 31 s). GCS ne conclut dans aucun cas en 1 h. Preuves en cours. | P48q est extrémal (minimum 6). C'est vrai sans preuve, et la certification est en cours. |
+| B5b | P48p n'a aucun vecteur de norme ≤ 4 | idem | ✅ sans preuve | UNSAT par Chuffed (55 min, 56 min, 3,5 min). GCS ne conclut pas. | P48p est extrémal. Certifier demandera un meilleur modèle ou beaucoup plus de temps. |
+| B6 | un [72,36,16] n'a pas d'automorphisme d'ordre 7 (Feulner et Nebe) | `aut.mzn` (structure F ⊕ E de l'article), un cas par dimension k de la partie C1 | 🔄 | k = 0, 1 UNSAT ✔︎ (baguette et GCS). k = 2 UNSAT en 4 s avec Chuffed, mais GCS et baguette ne concluent pas en 2 h. k = 3, 4, 5 donnent des codes de la relaxation dont la distance est < 16, et la boucle paresseuse tourne. | les cas faciles du théorème sont reproduits. Les cas k = 3 à 5 sont ceux où l'article a énuméré 70 millions de sous-codes, et c'est là que tout se joue. La brisure de symétrie LEX est admise. |
+| B7 | idem pour Z3×Z3, D10, l'ordre 6, Z4, Z2×Z2×Z2 | même schéma | ⏳ | | |
+| B8 | non-existence de (40,8,17) et (35,10,13) | `linear.mzn` + CNF de l'article AAAI | ❌ | Chuffed, GCS et Kissat UNKNOWN en 1 h | même Kissat ne conclut pas en 1 h. L'article lui donnait 24 h. On laisse de côté. |
+
+### B-détail : temps par solveur (secondes), taille de preuve, vérification
+
+| instance | Chuffed | GCS | GCS + preuve | baguette (toujours avec preuve) |
+|---|---|---|---|---|
+| Leech, norme 2 | 0,2 | 4,1 | 308, 35 Go, ✔︎ en 2414 s | 269, 313 Mo, ✔︎ en 24 s |
+| Golay, poids 4 | 0,2 | 0,2 | 0,2, 7 Mo, ✔︎ | 0,5, 2 Mo, ✔︎ |
+| QR48, poids ≤ 8, sans découpage | 7,4 | 27 | 238, 32 Go, ✔︎ en 1251 s (38 Go de RAM) | > 7200 |
+| QR48, avec découpage (par moitié) | 0,6 | 0,9 | 3,3, 360 Mo, ✔︎ en 20 s | 125 à 153, 143 Mo, ✔︎ en 7 s |
+| QR72, poids ≤ 8, sans découpage | 150 | 617 | preuve > 200 Go | > 7200 |
+| QR72, avec découpage (par moitié) | 3 | 6 | 34, 4,2 Go, ✔︎ en 210 s | 3910 à 4048, 1,1 Go, ✔︎ en 57 s |
+| QR80, poids ≤ 12, sans découpage | > 3600 | > 3600 | | |
+| QR80, avec découpage (par moitié) | 524 | 713 | preuve > 200 Go | en cours |
+| QR104, poids ≤ 16, avec découpage | > 3600 | > 3600 | | |
+| P48q, norme ≤ 4 (b=0 gauche, b=0 droite, b=1) | 1117, 983, 31 | > 3600 ×3 | en cours | en cours |
+| P48p, norme ≤ 4 (idem) | 3316, 3343, 210 | > 3600 ×3 | | |
+| ordre 7, k = 0 / 1 / 2 | 0,9 / 3,3 / 4,3 | 0,9 / 3,3 / > 3600 | ✔︎ / ✔︎ / > 7200 | ✔︎ / ✔︎ / > 7200 |
+
+Les tests de contrôle (SAT attendu) passent tous. On trouve un vecteur de norme 4 dans Leech, de norme 6
+dans P48p et P48q, et des mots de poids 12 et 16 dans QR48 et QR80, avec des preuves SAT vérifiées.
 
 ## C. Plan B, la question ouverte [72,36,16]
 
 | id | question | méthode | statut | résultat | ce que ça veut dire |
 |---|---|---|---|---|---|
-| C1 | existe-t-il un [72,36,16] avec un automorphisme d'ordre 5 ? | code invariant sous σ d'ordre 5, recherche avec GCS | ⏳ | | SAT serait un résultat majeur (un problème ouvert depuis 1973). UNSAT réduirait le groupe à l'ordre 1, 2 ou 3. |
-| C2 | idem pour l'ordre 3 | idem | ⏳ | | même chose. L'espace est plus grand et probablement hors de portée. |
-| C3 | idem pour l'ordre 2 et pour Z2×Z2 | idem | ⏳ | | ces cas sont sans doute les plus durs. |
+| C1 | existe-t-il un [72,36,16] avec un automorphisme d'ordre 5 ? | `aut.mzn`, type de cycles 5^14 1^2, relaxation K et boucle paresseuse | 🔄 | la relaxation K=2 rend en 3 h un code auto-dual doublement pair de distance 12, invariant par l'ordre 5. La boucle paresseuse tourne avec 4 h par tour. | rien de conclusif pour l'instant. SAT avec d=16 serait un résultat majeur. UNSAT réduirait le groupe à l'ordre 1, 2, 3 ou 4. |
+| C2 | idem pour l'ordre 3 (type 3^24) | idem | 🔄 | un premier tour n'a pas abouti en 1 h | probablement hors de portée. |
+| C3 | idem pour l'ordre 2 et pour Z2×Z2 | | ⏳ | | le modèle actuel ne traite que les ordres premiers impairs. |
 
 ## D. Plan C, les réseaux directement (modèle de Gram)
 
 | id | question | méthode | statut | résultat | ce que ça veut dire |
 |---|---|---|---|---|---|
-| D1 | retrouver un réseau pair unimodulaire de dimension 24 et de minimum 4 | Gram variable, coupes paresseuses sur les vecteurs courts (Fincke-Pohst) | ⏳ | | si on retrouve Leech, la méthode marche. Leech est le seul réseau possible, donc ça teste aussi l'unicité. |
-| D2 | idem en dimension 48 avec un automorphisme imposé | idem | ⏳ | | retrouver P48p ou P48q. Un cinquième réseau serait nouveau. |
+| D1 | retrouver un réseau pair unimodulaire de dimension 24 et de minimum 4 | Gram variable, coupes paresseuses | mis de côté | | la contrainte det G = 1 n'est pas exprimable simplement en CP. Et en passant par un code, D1 se ramène à A1 (Golay donne Leech). Toute la littérature passe par les codes, et les résultats du bloc B montrent pourquoi. |
+| D2 | idem en dimension 48 avec un automorphisme imposé | idem | mis de côté | | même raison. |
+
+## Ce qu'on retient (2026-11-17)
+
+- **Ce qui marche.** Avec le bon modèle, on certifie l'extrémalité de Leech et la distance des codes
+  de Golay, QR48 et QR72. La seule chose admise est le découpage en deux moitiés, qui tient en une
+  ligne sur papier. Les preuves font de quelques Mo à 4 Go, et VeriPB les vérifie en quelques minutes.
+- **Ce qui décide de tout, c'est le modèle.** Le découpage en deux moitiés divise les temps par 10 à
+  50 et les preuves par 100. Le solveur ne trouve pas seul cet argument.
+- **GCS contre baguette.** GCS résout plus vite, mais ses preuves sont 3 à 100 fois plus grosses.
+  Baguette résout plus lentement, souvent de beaucoup, mais ses preuves sont plus petites et se
+  vérifient vite. Sur le modèle d'automorphismes (k=2), Chuffed conclut en 4 s alors que GCS et
+  baguette ne concluent pas en 2 h. C'est un écart à comprendre, et peut-être un bon cas test pour
+  baguette.
+- **Les limites actuelles.** QR104 en minweight. P48 avec preuve, où seul Chuffed conclut. Les cas
+  k = 3 à 5 de l'ordre 7, qui ont demandé à Feulner et Nebe une énumération de 70 millions de codes.
 
 ## Ce qu'on ne fera pas, et pourquoi
 
