@@ -15,6 +15,9 @@ int: k;  int: m;
 array[1..k, 1..m] of 0..1: A;
 int: Wmax;                                % passer -D "Wmax=4;"
 int: HALF;                                % au plus HALF lignes choisies (HALF = k : aucune restriction)
+int: FIRST;                               % 0 : rien ; i > 0 : la première ligne choisie est la ligne i
+%  FIRST découpe encore chaque moitié en k cas disjoints (u_1 = … = u_{i-1} = 0, u_i = 1). Les k
+%  cas recouvrent tous les u non nuls, donc k UNSAT valent un UNSAT ; on les lance en parallèle.
 %  Argument des deux moitiés (celui de scripts/mindist.c). Si A·Aᵀ = I (code auto-dual), le
 %  même code s'écrit aussi [Aᵀ | I] : un mot (u, c) avec c = u·A vérifie u = c·Aᵀ. Un mot de
 %  poids ≤ Wmax a au plus Wmax/2 uns à gauche OU à droite. On lance donc deux instances,
@@ -35,6 +38,7 @@ constraint forall(j in 1..m)(
 
 constraint sum(i in 1..k)(bool2int(u[i])) >= 1;
 constraint sum(i in 1..k)(bool2int(u[i])) <= HALF;
+constraint if FIRST > 0 then u[FIRST] /\ forall(i in 1..FIRST-1)(not u[i]) else true endif;
 constraint sum(i in 1..k)(bool2int(u[i])) + sum(j in 1..m)(bool2int(c[j])) <= Wmax;
 
 solve satisfy;

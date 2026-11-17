@@ -53,6 +53,10 @@ def systematic(G):
 
 
 E = []
+if os.environ.get("RESUME") and os.path.exists(f"{out}.dzn"):   # restart from the last round's E
+    txt = open(f"{out}.dzn").read()
+    E = [sorted(int(x) for x in grp.split(",") if x.strip()) for grp in re.findall(r"\{([^}]*)\}", txt)]
+    print(f"resumed with |E| = {len(E)}", flush=True)
 t0 = time.time()
 for rnd in range(1, 100000):
     with open(f"{out}.dzn", "w") as fh:
