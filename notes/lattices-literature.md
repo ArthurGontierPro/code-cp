@@ -99,8 +99,19 @@ exist for k ≥ 2 (Harada–Miezaki, built from Γ72). Z4 at length 72 is open.
   models are the right tool. The natural targets are:
   (a) the binary Type II [72,36,16] code, open for 50 years (our model at q72, which we ran
       under BDC; the literature already excludes most automorphism groups);
-  (b) ternary extremal self-dual codes [72,36,21], also open, which via B3 + doubling
-      is the analogue of how P48p/q come from [48,24,15]. Our model generalises to F3.
+  (b) CORRECTED 2026-11-17: ternary extremal [72,36,21] does NOT exist (negative coefficient in
+      the extremal weight enumerator, Rains–Sloane survey). Not a target.
 - R0/R2 certificate: reproduce Leech "no norm 2" and P48 "no norm ≤ 4" as VeriPB proofs.
   The Stehlé–Watkins shape (a cheap witness set + a modular-form identity) is a template for
   checkable proofs that do not need full UNSAT enumeration.
+
+## [72,36,16] state of the art (checked 2026-11-17)
+- Still open. Aut(C) is cyclic of order 1, 2, 3, 4 or 5, or elementary abelian of order 4
+  (Borello–Dalla Volta–Nebe, arXiv 1303.4899). Later papers exclude Z2×Z2×Z2 (1304.7162) and Z4
+  (1310.2570). Order 6 (1203.3321), Z7, Z3×Z3 and D10 (1110.6012) are excluded too.
+- CONSEQUENCE: our BDC runs at q72 were hopeless by construction, because a bordered double
+  circulant has an automorphism of order 35, which is excluded. Any symmetry hypothesis at 72
+  must be of order ≤ 5.
+- These exclusions are computer classifications (fix σ, enumerate the fixed and the σ-invariant
+  subcodes, glue). Each one is a finite UNSAT with no independent certificate: a certification
+  target that fits CP + VeriPB.
