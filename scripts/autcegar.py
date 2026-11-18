@@ -29,6 +29,35 @@ par = dict(kv.split("=") for kv in dstr.replace(" ", "").split(";") if kv)
 p, c, f, d = (int(par[x]) for x in "pcfd")
 n = p * c + f
 m = n // 2
+k = int(par["k"])
+h = (c + f) // 2
+deg = next(t for t in range(1, p) if pow(2, t, p) == 1)          # dim of K1 over F2
+T = (p - 1) // deg
+GROUPS = [range(1, k + 1)] + ([range(k + 1, c + 1)] if T == 2 else [])   # E1 rows, E2 rows
+IMG = os.environ.get("IMG", "")        # "1": also add the images of each light set (see images())
+
+
+def images(S):
+    """Images of a light generator set S (1-based rows of G) under the transpositions of E rows
+    within E1 and within E2. Swapping E1 rows a, b together with info cycles a, b (or E2 rows,
+    i.e. columns of M, with their cycles) maps a model solution to another one, and S's light word
+    to the corresponding light word there; so the image excludes that symmetric solution in
+    advance. Any generator set gives a valid constraint for every true code, so this is sound
+    whatever the symmetry does to the C0 rows (left unchanged here)."""
+    out = set()
+    for grp in GROUPS:
+        for a in grp:
+            for b in grp:
+                if a >= b:
+                    continue
+                def sw(g):
+                    if g <= h:
+                        return g
+                    e, t = (g - h - 1) // deg + 1, (g - h - 1) % deg
+                    e = b if e == a else a if e == b else e
+                    return h + (e - 1) * deg + t + 1
+                out.add(tuple(sorted(sw(g) for g in S)))
+    return out
 with open(f"{out}.pid", "a") as fh:
     fh.write(f"{os.getpid()}\n")
 
@@ -103,7 +132,10 @@ for rnd in range(1, 100000):
                     chk ^= G[g]
                 assert chk == w
                 new.add(tuple(sorted(g + 1 for g in orig)))
-    new = [e for e in sorted(new) if e not in E]
+    if IMG and new:
+        new |= set().union(*(images(S) for S in new))
+    Eset = set(map(tuple, E))
+    new = [e for e in sorted(new) if tuple(e) not in Eset]
     print(f"round {rnd}: {res[-1] if res else '?'}, {len(new)} new light sets, |E| {len(E)} -> {len(E)+len(new)}, "
           f"{time.time()-t0:.0f} s", flush=True)
     if not new:
