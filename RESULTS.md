@@ -303,7 +303,7 @@ solveur sont dans le tableau B-détail plus bas. ✔︎ veut dire « preuve vér
 | B2 | Golay n'a aucun mot de poids 4 | `minweight.mzn`, code fixé | ✅ ✔︎ | moins d'une seconde pour tous les solveurs, preuves de quelques Mo | Golay a bien une distance de 8. |
 | B3 | QR48 n'a aucun mot de poids ≤ 8 | `minweight.mzn`, puis découpage en deux moitiés | ✅ ✔︎ | sans découpage, preuve GCS de 32 Go. Avec découpage, 2 × 3 s et 2 × 360 Mo (GCS), 2 × 2,5 min et 2 × 143 Mo (baguette). | QR48 a une distance de 12, c'est le code extrémal de longueur 48. |
 | B3b | QR72 n'a aucun mot de poids ≤ 8 | idem | ✅ ✔︎ | sans découpage, la preuve GCS dépasse 200 Go. Avec découpage, GCS 2 × 35 s et 2 × 4 Go, baguette 2 × 66 min et 2 × 1 Go. | distance ≥ 12 (QR72 n'est pas extrémal, il lui faudrait 16). Sert d'échelon de difficulté. |
-| B4 | QR80 n'a aucun mot de poids ≤ 12 | idem | 🔄 | sans découpage, rien en 1 h. Avec découpage, UNSAT en 9 min (Chuffed) et 12 min (GCS) par moitié. La preuve GCS dépasse 200 Go, et baguette tourne encore. | QR80 a une distance de 16. C'est le code qu'utilisent Stehlé et Watkins pour le réseau N80. Pas encore certifié. |
+| B4 | QR80 n'a aucun mot de poids ≤ 12 | idem, puis chaque moitié découpée selon la 1re, la 2e, puis la 3e ligne choisie (cas disjoints, lancés en parallèle) | 🔄 | Chuffed règle les 80 cas du premier niveau (86 s au plus chacun). Avec baguette, 52 cas sur 80 sont certifiés au premier niveau et 1152 sur 1178 au deuxième (125 Go de preuves au total, 1,1 Go au plus par cas). Il reste 26 cas, redécoupés au troisième niveau, qui tournent. | QR80 a une distance de 16 (vrai sans preuve). La certification sera complète quand les 26 derniers cas seront fermés. |
 | B4b | QR104 n'a aucun mot de poids ≤ 16 | idem | ❌ | UNKNOWN en 1 h, même avec découpage | c'est la limite actuelle du modèle CP. Le programme dédié `mindist` règle les quatre codes précédents en moins d'une seconde. |
 | B5 | P48q n'a aucun vecteur de norme ≤ 4 | `shortvec.mzn`, découpage en trois cas (voir l'en-tête du modèle) | 🔄 | UNSAT par Chuffed dans les trois cas (19 min, 16 min, 31 s). GCS ne conclut dans aucun cas en 1 h. Preuves en cours. | P48q est extrémal (minimum 6). C'est vrai sans preuve, et la certification est en cours. |
 | B5b | P48p n'a aucun vecteur de norme ≤ 4 | idem | ✅ sans preuve | UNSAT par Chuffed (55 min, 56 min, 3,5 min). GCS ne conclut pas. | P48p est extrémal. Certifier demandera un meilleur modèle ou beaucoup plus de temps. |
@@ -322,7 +322,9 @@ solveur sont dans le tableau B-détail plus bas. ✔︎ veut dire « preuve vér
 | QR72, poids ≤ 8, sans découpage | 150 | 617 | preuve > 200 Go | > 7200 |
 | QR72, avec découpage (par moitié) | 3 | 6 | 34, 4,2 Go, ✔︎ en 210 s | 3910 à 4048, 1,1 Go, ✔︎ en 57 s |
 | QR80, poids ≤ 12, sans découpage | > 3600 | > 3600 | | |
-| QR80, avec découpage (par moitié) | 524 | 713 | preuve > 200 Go | en cours |
+| QR80, avec découpage (par moitié) | 524 | 713 | preuve > 200 Go | > 7200 |
+| QR80, moitiés × 1re ligne (80 cas) | ≤ 86 par cas | | | 52 cas ✔︎, les cas 1re ligne ≤ 14 > 3 h |
+| QR80, × 2e ligne (1178 cas) | | | | 1152 cas ✔︎, 26 cas > 2 h |
 | QR104, poids ≤ 16, avec découpage | > 3600 | > 3600 | | |
 | P48q, norme ≤ 4 (b=0 gauche, b=0 droite, b=1) | 1117, 983, 31 | > 3600 ×3 | en cours | en cours |
 | P48p, norme ≤ 4 (idem) | 3316, 3343, 210 | > 3600 ×3 | | |
@@ -336,7 +338,12 @@ dans P48p et P48q, et des mots de poids 12 et 16 dans QR48 et QR80, avec des pre
 | id | question | méthode | statut | résultat | ce que ça veut dire |
 |---|---|---|---|---|---|
 | C1 | existe-t-il un [72,36,16] avec un automorphisme d'ordre 5 ? | `aut.mzn`, type de cycles 5^14 1^2, relaxation K et boucle paresseuse | 🔄 | la relaxation K=2 rend en 3 h un code auto-dual doublement pair de distance 12, invariant par l'ordre 5. La boucle paresseuse tourne avec 4 h par tour. | rien de conclusif pour l'instant. SAT avec d=16 serait un résultat majeur. UNSAT réduirait le groupe à l'ordre 1, 2, 3 ou 4. |
-| C2 | idem pour l'ordre 3 (type 3^24) | idem | 🔄 | un premier tour n'a pas abouti en 1 h | probablement hors de portée. |
+| C2 | idem pour l'ordre 3 (type 3^24) | idem | 🔄 | aucun tour n'aboutit en 4 h | probablement hors de portée. |
+
+Note (2026-11-18). Une partie des « UNKNOWN » des boucles paresseuses (ordre 7, k = 3) n'étaient pas
+des timeouts. MiniZinc 2.10.1 plantait (segfault) en aplatissant le modèle quand les combinaisons
+paresseuses dépassaient environ 3500 ensembles d'une vingtaine de lignes. Le XOR de ces ensembles est
+maintenant écrit comme une parité linéaire, et les boucles sont relancées avec des tours de 8 h.
 | C3 | idem pour l'ordre 2 et pour Z2×Z2 | | ⏳ | | le modèle actuel ne traite que les ordres premiers impairs. |
 
 ## D. Plan C, les réseaux directement (modèle de Gram)
