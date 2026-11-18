@@ -479,6 +479,15 @@ cubes.
   En 72, seul l'ordre 7 avec k = 5 a atteint la distance 12. La voie suivante est celle de Feulner et
   Nebe : énumérer d'abord les petits codes composants avec un élagage fort, puis les recoller, chaque
   étape étant un problème borné.
+- **La symétrie peut se prouver au lieu de s'admettre** (`dom/README.md`). On garde la preuve du
+  solveur telle quelle, et un script ajoute devant elle des lignes `dom` qui redérivent les
+  contraintes de symétrie, sous les mêmes étiquettes. VeriPB vérifie le tout d'un bloc, et le script
+  n'a pas besoin d'être cru. C'est fait pour les trois coordonnées de Golay et de QR48, et pour le tri
+  des colonnes du benchmark AAAI-26, dont la version stricte est refusée à juste titre (E10).
+- **Le prix est un modèle symétrique.** Sur QR48 il a 17296 parités au lieu de 24 chaînes de XOR.
+  Chuffed y fait autant de nœuds mais chacun coûte 1000 fois plus. Baguette, grâce à ses coupes qui
+  additionnent des parités, fait 20 fois moins de nœuds que Chuffed, mais des nœuds 20 fois plus
+  chers. Sans annotation, GCS branche sur les auxiliaires et ne finit pas Golay sans symétrie.
 
 ## Ce qu'on ne fera pas, et pourquoi
 

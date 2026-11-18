@@ -30,7 +30,10 @@ coord_of_b = {b: i for i, b in enumerate(bvar)}
 words = [tuple(w) for w in J["words"]]
 widx = {w: i for i, w in enumerate(words)}
 yvar = [None] * len(words)
-for args in re.findall(r"int_lin_eq\(\w+,\[(.*?)\],0\)", F):
+# the variable list is either written inline or, when MiniZinc shares it, as a named array
+named = dict(re.findall(r"array \[1\.\.\d+\] of var int: (\w+)[^=]*= \[(.*?)\];", F))
+for args in re.findall(r"int_lin_eq\(\w+,(\[.*?\]|\w+),0\)", F):
+    args = named[args] if not args.startswith("[") else args[1:-1]
     vs = [v.strip() for v in args.split(",")]
     sup = [coord_of_b[v] for v in vs if v in coord_of_b]
     rest = [v for v in vs if v not in coord_of_b]

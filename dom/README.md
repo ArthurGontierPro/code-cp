@@ -77,3 +77,41 @@ les échanger ne change rien, donc rien ne permet de les interdire. Sur le code 
 dont toutes les colonnes valent 1, le tri strict rend le modèle UNSAT alors que le code existe. VeriPB
 refuse la preuve fusionnée exactement là. Sur les instances du benchmark (k ≥ 8) ce n'est peut-être
 pas grave, mais c'est un axiome non justifié, et la règle de dominance l'a trouvé toute seule.
+
+# Troisième partie : ce que coûte le modèle symétrique (QR48, 18/11)
+
+Question : un mot non nul de poids ≤ 8 dans QR48 (UNSAT). Le modèle symétrique a une parité par mot
+de poids 12, soit 17296 contraintes de 13 variables. La forme systématique a 24 chaînes de XOR.
+Les runs sont `bench/sym.sh` et `bench/symheur.sh` (`results/runs/SYM_*`, `SH_*`), avec baguette
+2c97b16, le binaire du nœud. Les sessions de baguette optimisent en ce moment son coût par nœud et
+sa recherche (M10, M11), donc ses chiffres sont ceux d'une version déjà dépassée.
+
+| trois coordonnées imposées | nœuds | temps | temps par nœud |
+|---|---|---|---|
+| Chuffed, systématique | 11 306 | 0,13 s | 11 µs |
+| Chuffed, symétrique, sans annotation | 28 666 (profondeur 17 301) | 104 s | 3,6 ms |
+| Chuffed, symétrique, recherche sur x (1 d'abord) | 14 891 (profondeur 8) | 170 s | 11 ms |
+| GCS, symétrique, sans annotation | 21 385 | 117 s | 5,5 ms |
+| baguette, systématique | 27 178 | 128 s | 4,7 ms |
+| baguette, symétrique, sans annotation | 1 205 | 96 s | 80 ms |
+| baguette, symétrique, recherche sur x (1 d'abord) | 723 | 65 s | 90 ms |
+| baguette, symétrique, sans analyse de conflits PB | ? | > 1800 s, 4,8 Go | |
+
+- Le coût vient de la propagation, pas de la recherche. Chaque coordonnée est dans 4324 des 17296
+  mots, donc chaque décision réveille des milliers de sommes (Chuffed fait 9000 propagations par
+  nœud). Chuffed fait à peu près autant de nœuds que sur la forme systématique, mais chacun coûte
+  1000 fois plus. Les 17296 parités sont 720 fois redondantes, puisque 24 suffisent à définir le
+  code. On ne peut pas en garder moins tant que l'ensemble doit rester invariant par le groupe,
+  parce que les mots de poids 12 forment une seule orbite de PSL(2, 47).
+- Sans annotation, Chuffed et GCS branchent aussi sur les auxiliaires y_w (profondeur 17 301). Sur
+  QR48 cela coûte peu, mais sur Golay sans symétrie GCS ne finit pas en 30 minutes (28 millions de
+  nœuds), alors qu'en branchant sur x il finit en 855 nœuds. Chuffed passe de 10 403 à 430 nœuds.
+- Baguette fait 20 à 40 fois moins de nœuds que les autres grâce à son analyse de conflits PB. Sur
+  QR48 il apprend 588 contraintes PB, et 511 d'entre elles contiennent au moins deux auxiliaires
+  y_w avec le coefficient 2. Il additionne donc des sommes de parité entre elles, ce qui revient à
+  raisonner sur les XOR, chose que des clauses ne savent pas faire. Sans cette analyse, il ne
+  finit pas. Sur la forme systématique, elle ne change rien (mêmes 27 178 nœuds), parce que les
+  XOR y sont des clauses. Le prix est un nœud 20 fois plus cher que sur la forme systématique.
+- Sans les trois coordonnées imposées, aucun solveur ne finit le modèle symétrique en 30 minutes,
+  alors que la forme systématique se fait en 7,6 s (Chuffed). La symétrie est donc indispensable à
+  ce modèle, et c'est justement ce qu'on sait maintenant prouver.
