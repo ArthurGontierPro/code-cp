@@ -45,3 +45,35 @@ clause découle des autres par propagation (RUP) sans avoir besoin du témoin.
   la comparaison avec la forme systématique sur QR48 et QR80.
 - Les deux autres preuves à lex de la piste 7 (AAAI-26 `linear.mzn`, `aut.mzn` avec LEX) restent
   à faire.
+
+# Deuxième partie : le tri des colonnes du benchmark AAAI-26
+
+`models/linear_dom.mzn` reprend `linear.mzn` (codes linéaires (n, k, d) quelconques) avec pour seule
+brisure de symétrie le tri des colonnes de A. Chaque contrainte « colonne j ≤ colonne j+1 » est une
+seule inégalité à coefficients 8, 4, 2, 1 (la colonne lue comme un nombre binaire). Toutes les
+contraintes du modèle sont écrites colonne par colonne de la même façon, donc l'échange de deux
+colonnes voisines est un témoin qui s'écrit comme une liste de variables.
+
+`scripts/domlex.py` retire ces inégalités du .opb de baguette et les redérive par `dom`. L'ordre lit
+A colonne par colonne comme un seul nombre binaire, et le témoin échange les colonnes j et j+1 de A,
+de X (les XOR des lignes) et des entiers `bool2int` que MiniZinc a introduits. VeriPB ne trouve pas
+seul que l'échange fait descendre dans l'ordre, parce qu'il faut multiplier l'inégalité par
+(2^k − 1)·2^(N − k(j+2)). La sous-preuve donne cette multiplication, une ligne `pol` par but.
+`dom/runlex.sh NOM "n=..;k=..;d=..;LEX=..;"` fait toute la chaîne sur le nœud.
+
+| instance | LEX | baguette | preuve fusionnée | témoin faux (colonnes de A seules) |
+|---|---|---|---|---|
+| (10, 4, 5) | large | UNSAT | ✅ 5 lignes dom | refusé |
+| (10, 4, 4) | large | SAT | ✅ | refusé |
+| (14, 5, 7) | large | UNSAT | ✅ 8 lignes dom | refusé |
+| (15, 5, 7) | large | SAT | ✅ 9 lignes dom | refusé |
+| (10, 4, 5) | stricte | UNSAT | ❌ refusée au but « pas au-dessus » | |
+| (15, 5, 7) | stricte | SAT | ❌ refusée au même endroit | |
+| (4, 1, 4) | stricte | **UNSAT, à tort** | ❌ refusée | |
+| (4, 1, 4) | large | SAT, le code à répétition | ✅ | accepté, à raison (k = 1, donc X = A et le témoin est juste) |
+
+Le tri strict de l'article n'est pas une conséquence de la symétrie. Quand deux colonnes sont égales,
+les échanger ne change rien, donc rien ne permet de les interdire. Sur le code à répétition [4, 1, 4],
+dont toutes les colonnes valent 1, le tri strict rend le modèle UNSAT alors que le code existe. VeriPB
+refuse la preuve fusionnée exactement là. Sur les instances du benchmark (k ≥ 8) ce n'est peut-être
+pas grave, mais c'est un axiome non justifié, et la règle de dominance l'a trouvé toute seule.

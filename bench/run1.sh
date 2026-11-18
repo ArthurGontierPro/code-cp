@@ -13,14 +13,15 @@ GCS=/scratch/arthur/gcs/build/glasgow.msc; BAG=/scratch/arthur/golay/baguette
 VERIPB=$HOME/.cargo/bin/veripb
 ulimit -S -v ${MEM:-16000000}; ulimit -f 200000000   # 200 GB cap per proof file
 IA=$INST; [ "$INST" = - ] && IA=""
+DA=(); [ -n "$PAR" ] && DA=(-D "$PAR")   # no -D at all when PARAMS is empty (minizinc refuses -D "")
 cd $B; extra=""
 case $S in chuffed) SL=chuffed ;; gcs|gcsP) SL=$GCS ;; bag) SL=$BAG/tools/baguette.msc ;; esac
-$MZN -c --solver $SL -D "$PAR" $MOD $IA -o $O.fzn > $O.log 2>&1
+$MZN -c --solver $SL "${DA[@]}" $MOD $IA -o $O.fzn > $O.log 2>&1
 t0=$(date +%s.%N)
 case $S in
-  chuffed) timeout $((TL+120)) $MZN --solver chuffed $EXTRA -D "$PAR" $MOD $IA --time-limit ${TL}000 -s >> $O.log 2>&1 ;;
-  gcs)     timeout $((TL+120)) $MZN --solver $GCS -D "$PAR" $MOD $IA --time-limit ${TL}000 -s >> $O.log 2>&1 ;;
-  gcsP)    timeout $((TL+120)) $MZN --solver $GCS -D "$PAR" $MOD $IA --time-limit ${TL}000 -s \
+  chuffed) timeout $((TL+120)) $MZN --solver chuffed $EXTRA "${DA[@]}" $MOD $IA --time-limit ${TL}000 -s >> $O.log 2>&1 ;;
+  gcs)     timeout $((TL+120)) $MZN --solver $GCS "${DA[@]}" $MOD $IA --time-limit ${TL}000 -s >> $O.log 2>&1 ;;
+  gcsP)    timeout $((TL+120)) $MZN --solver $GCS "${DA[@]}" $MOD $IA --time-limit ${TL}000 -s \
              --prove --proof-files-basename $O >> $O.log 2>&1 ;;
   bag)     /usr/bin/time -f "rss_kb %M" timeout $((TL * 3 / 2 + 120)) $BAG/_build/default/bin/main.exe $O.fzn \
              --proof $O --stats --time-limit $TL > $O.sol 2>> $O.log

@@ -12,7 +12,8 @@ support, and OUT.pbp, a single proof that
 Baguette's proof refers to constraints only by their labels, so nothing is renumbered.
 VeriPB on (OUT.opb, OUT.pbp) then checks the whole chain: the symmetry breaking and the UNSAT.
 """
-import sys, re, json
+import sys, os, re, json
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 fzn, opb, pbp, js, out = sys.argv[1:6]
 J = json.load(open(js))
@@ -55,13 +56,8 @@ for l in lines:
     if body in want:
         label[body] = lab
 assert len(label) == len(want), f"found {len(label)} of {len(want)} symmetry clauses in the .opb"
-removed = {label[b] for b in want}
-keep = [l for l in O if not (l.startswith("@c") and l.split(" ", 1)[0] in removed)]
-keep = [re.sub(r"#constraint= \d+", f"#constraint= {len(lines) - len(removed)}", l) for l in keep]
-open(out + ".opb", "w").write("\n".join(keep) + "\n")
 
 # ---- witness: every variable of the .opb must be moved consistently or be fixed by pi
-import os
 BAD = os.environ.get("BAD")          # negative test: the transposition (c b), not an automorphism (BAD=all, or BAD=k for the k-th dom line only)
 def witness(c):
     pi, wpi = c["pi"], c["wpi"]
@@ -80,19 +76,10 @@ def witness(c):
     return " ".join(f"{a} -> {b}" for a, b in m.items() if a != b)
 
 c1, c2, c3 = (lit(xs[c], 1) for c in J["fixed"])
-P = open(pbp).read().splitlines()
-assert P[1].startswith("f "), P[1]
-head = [P[0], f"f {len(lines) - len(removed)} ;",
-        "% ---- symmetry breaking by dominance (scripts/dommerge.py) ----",
-        "% order: compare x_c1, then x_c2, then x_c3; an assignment with a 1 comes first",
-        "def_order lex3", "  vars", "    left u1 u2 u3;", "    right v1 v2 v3;", "    aux;", "  end;",
-        "  def", "    -4 u1 -2 u2 -1 u3 4 v1 2 v2 1 v3 >= 0;", "  end;",
-        "  transitivity", "    vars", "      fresh_right w1 w2 w3;", "    end;", "    proof",
-        "      proofgoal #1", "        pol 1 2 + 3 +;", "      qed : -1;", "    qed;", "  end;", "end;",
-        f"load_order lex3 ~{c1} ~{c2} ~{c3};"]
-for c, body in zip(J["clauses"], want):
-    head.append(f"{label[body]} dom {body.rstrip(' ;')} : {witness(c)} ;")
-head += ["load_order;", "% ---- baguette's proof, unchanged ----"]
-open(out + ".pbp", "w").write("\n".join(head + P[2:]) + "\n")
-print(f"removed {len(removed)} clauses, {len(lines) - len(removed)} constraints left; "
-      f"{len(want)} dom lines; witness size {len(witness(J['clauses'][0]).split(' -> ')) - 1} moves")
+import domproof
+nrem, left = domproof.merge(
+    opb, pbp, out, domproof.def_order("lex3", 3, [4, 2, 1]), f"load_order lex3 ~{c1} ~{c2} ~{c3};",
+    [(label[b], witness(c)) for c, b in zip(J["clauses"], want)],
+    "symmetry breaking by dominance (scripts/dommerge.py): order x_c1, then x_c2, then x_c3, a 1 first")
+print(f"removed {nrem} clauses, {left} constraints left; {len(want)} dom lines; "
+      f"witness size {len(witness(J['clauses'][0]).split(' -> ')) - 1} moves")

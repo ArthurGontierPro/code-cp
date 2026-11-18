@@ -25,11 +25,33 @@ p, Wmax, nfix = int(sys.argv[1]), int(sys.argv[2]), int(sys.argv[3])
 n = p + 1
 G = gi.extended_qr(p, 2)
 k = len(G)
-code = set()
-for u in itertools.product((0, 1), repeat=k):
-    code.add(tuple(sum(u[i] * G[i][j] for i in range(k)) % 2 for j in range(n)))
-d = min(sum(c) for c in code if any(c))
-words = sorted(c for c in code if sum(c) == d)
+# codewords as bit masks (bit j = coordinate j), enumerated in Gray-code order
+rows = [sum(r[j] << j for j in range(n)) for r in G]
+d, words, c = n, [], 0
+for t in range(1, 1 << k):
+    c ^= rows[(t & -t).bit_length() - 1]
+    w = bin(c).count("1")
+    if w < d:
+        d, words = w, [c]
+    elif w == d:
+        words.append(c)
+words = sorted(words)
+basis = {}                                        # GF(2) echelon basis of the code, by top bit
+for r in rows:
+    while r:
+        h = r.bit_length() - 1
+        if h not in basis:
+            basis[h] = r; break
+        r ^= basis[h]
+def in_code(v):
+    while v:
+        h = v.bit_length() - 1
+        if h not in basis:
+            return False
+        v ^= basis[h]
+    return True
+def apply(pi, v):                                 # the word whose coordinate j is v's coordinate pi[j]
+    return sum(((v >> pi[j]) & 1) << j for j in range(n))
 
 INF = p
 def mob(f):            # f on F_p ∪ {inf} -> permutation of 0..n-1
@@ -39,7 +61,7 @@ sq = sorted({x * x % p for x in range(1, p)})
 cands = [mob(lambda x: INF if x == INF else (x + 1) % p)]
 cands += [mob(lambda x, r=r: INF if x == INF else r * x % p) for r in sq]
 cands += [mob(lambda x, e=e: 0 if x == INF else INF if x == 0 else e * inv(x) % p) for e in (1, p - 1)]
-is_aut = lambda pi: all(tuple(r[pi[j]] for j in range(n)) in code for r in G)
+is_aut = lambda pi: all(in_code(apply(pi, r)) for r in rows)
 gens = [g for g in cands if is_aut(g)]
 group = {tuple(range(n))}
 frontier = list(group)
@@ -56,6 +78,7 @@ assert all(is_aut(g) for g in itertools.islice(group, 200))
 
 # witness semantics (VeriPB): x_j -> x_pi(j) means the new value of x_j is the old value of x_pi(j)
 fixed = [0, 1, 2][:nfix]
+group_sorted = sorted(group)
 clauses = []                       # (c, b, pi), 0-based
 for t, c in enumerate(fixed):
     for b in range(n):
@@ -69,19 +92,21 @@ for t, c in enumerate(fixed):
             if t == 2:                                   # keep {c1, c2} as a set
                 return {g[fixed[0]], g[fixed[1]]} == set(fixed[:2])
             return True
-        g = next((g for g in sorted(group) if ok(g)), None)
+        g = next((g for g in group_sorted if ok(g)), None)
         assert g is not None, (c, b)
         clauses.append((c, b, g))
 
 widx = {w: i for i, w in enumerate(words)}
+inverse = lambda g: [g.index(j) for j in range(n)]
+bits = lambda w: [(w >> j) & 1 for j in range(n)]
 out = os.path.join(B, "dom", f"sym_p{p}_w{Wmax}")
 with open(out + ".dzn", "w") as f:
     f.write(f"n = {n}; nW = {len(words)}; Wmax = {Wmax}; wd = {d};\n")
-    f.write("W = [|" + "|".join(",".join(map(str, w)) for w in words) + "|];\n")
+    f.write("W = [|" + "|".join(",".join(map(str, bits(w))) for w in words) + "|];\n")
     f.write(f"nF = {len(clauses)};\n")
     f.write(f"FA = {[c + 1 for c, b, g in clauses]};\nFB = {[b + 1 for c, b, g in clauses]};\n")
-json.dump({"n": n, "words": words, "fixed": fixed,
+json.dump({"n": n, "words": [bits(w) for w in words], "fixed": fixed,
            "clauses": [{"c": c, "b": b, "pi": list(g),
-                        "wpi": [widx[tuple(w[g.index(j)] for j in range(n))] for w in words]}
+                        "wpi": [widx[apply(inverse(g), w)] for w in words]}
                        for c, b, g in clauses]}, open(out + ".json", "w"))
 print(f"p={p} n={n} d={d} words={len(words)} |PSL|={len(group)} clauses={len(clauses)} -> {out}.dzn")

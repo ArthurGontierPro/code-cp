@@ -20,7 +20,7 @@ array[1..nW, 1..n] of 0..1: W;
 int: nF;  array[1..nF] of 1..n: FA;  array[1..nF] of 1..n: FB;
 
 array[1..n] of var bool: x;
-array[1..nW] of var 0..wd div 2: y;
+array[1..nW] of var 0..min(wd, Wmax) div 2: y;     % la somme sur w ne dépasse ni |w| ni le poids du mot
 
 constraint forall(w in 1..nW)(sum(i in 1..n where W[w, i] = 1)(bool2int(x[i])) = 2 * y[w]);
 constraint sum(i in 1..n)(bool2int(x[i])) >= 1;
