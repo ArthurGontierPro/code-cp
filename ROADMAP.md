@@ -44,3 +44,38 @@ tourne et ce qui vient ensuite.
 - **R6. Ce qu'on attend de baguette** (demandes dans son WORKLOG) : le coût par nœud sur les modèles
   pleins de XOR, une étude d'heuristiques, l'oubli de clauses par LBD, les redémarrages, les cubes
   sous hypothèses, la parité, et la correction du `bool_xor` avec une constante.
+
+## Pistes à garder (18/11)
+
+Discutées le 18/11, aucune n'est lancée. Les numéros sont ceux de la discussion.
+
+Résultats mathématiques certifiés
+
+1. Certifier les exclusions publiées pour le [72, 36, 16] (ordre 7 par Feulner et Nebe, types
+   d'ordre 2, 3 et 5 par Bouyuklieva, Yankov, Borello et d'autres). Ce sont des calculs Magma sans
+   certificat. C'est R4 poussé jusqu'au bout, et c'est publiable même sans résultat nouveau.
+2. Certifier le minimum 8 du réseau de Nebe Γ72. Il faut un modèle neuf, parce que Γ72 se construit à
+   partir de Leech sur Z[(1+√−7)/2] et pas à partir d'un code binaire.
+3. La dimension 96 par des constructions structurées (codes sur Z_{2k}, réseaux idéaux dans
+   Q(ζ97)). Spéculatif, attend que 1 marche. Voir `notes/length96.md`.
+
+Faiblesses des solveurs
+
+4. La parité. Tous les modèles de codes sont des XOR, aucun de nos solveurs CP ne raisonne dessus.
+   Comparer avec CryptoMiniSat (élimination de Gauss), puis un propagateur de Gauss journalisé dans
+   baguette (preuves de parité de Gocht et Nordström, AAAI 2021).
+5. Le coût par nœud et l'heuristique. Rejouer le tableau B-heur quand baguette aura ses redémarrages,
+   son oubli par LBD et ses heuristiques.
+6. Le comptage. Les comptes connus (759, 17296, 196560, 52416000) sont des bancs pour les compteurs
+   de modèles, et le comptage certifié existe (CPOG, Bryant et al., 2023).
+
+Chaîne de confiance
+
+7. Justifier la fixation de trois coordonnées (minweight_fix) par la règle de dominance de VeriPB,
+   avec les automorphismes de PSL(2, p) comme témoins. La difficulté connue est que l'encodage actuel
+   (forme systématique, chaînes de XOR) n'est pas symétrique, donc l'image d'une contrainte par un
+   automorphisme du code n'est pas une contrainte de la base. À essayer d'abord à la main sur
+   Hamming [8, 4, 4].
+8. Recoller les cas et les moitiés par des conclusions ¬cube et un fichier qui les combine.
+
+Ordre proposé : 7, puis 1, avec 4 en parallèle côté baguette. 2 et 6 font de bons sujets d'étudiant.
