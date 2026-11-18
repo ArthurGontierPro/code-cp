@@ -10,3 +10,6 @@ poids ≤ 2 ? Variables x1 à x4 pour les coordonnées, x5 pour la parité (x1 +
   refuse à la ligne 25, parce que l'image de 0011 est 1011, qui est de poids impair.
 
 `~/.cargo/bin/veripb parite4.opb parite4.pbp`
+
+`hamming_dom.opb` et `hamming_dom.pbp` : la preuve fusionnée de `dom/` sur Hamming (poids ≤ 2), soit 18 lignes
+`dom` puis la preuve de baguette. La plus petite preuve réelle de la chaîne, à lire en entier.
