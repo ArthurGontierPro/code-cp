@@ -2,7 +2,7 @@
 # run1.sh SOLVER MODEL INSTANCE PARAMS LABEL -- one run on the node, writes results/runs/LABEL.{log,res}
 #   SOLVER: chuffed | gcs (no proof) | gcsP (GCS --prove, then veripb) | bag (baguette, proof, veripb)
 #   MODEL: models/X.mzn   INSTANCE: instances/Y.dzn   PARAMS: e.g. "M=2;"
-# TL env (seconds, default 3600). Memory cap 16 GB per run.
+# TL env (seconds, default 3600). Memory cap 16 GB per run. EXTRA env: extra Chuffed flags (e.g. -f).
 # The FlatZinc and the .opb are part of the trust chain (RESULTS.md, E), so both are kept, gzipped:
 # LABEL.fzn.gz for every solver (for chuffed and gcs a separate `-c` with the same flags, flattening
 # is deterministic), LABEL.opb.gz for gcsP and bag. Only the .pbp is deleted unless KEEP is set.
@@ -18,7 +18,7 @@ case $S in chuffed) SL=chuffed ;; gcs|gcsP) SL=$GCS ;; bag) SL=$BAG/tools/baguet
 $MZN -c --solver $SL -D "$PAR" $MOD $IA -o $O.fzn > $O.log 2>&1
 t0=$(date +%s.%N)
 case $S in
-  chuffed) timeout $((TL+120)) $MZN --solver chuffed -D "$PAR" $MOD $IA --time-limit ${TL}000 -s >> $O.log 2>&1 ;;
+  chuffed) timeout $((TL+120)) $MZN --solver chuffed $EXTRA -D "$PAR" $MOD $IA --time-limit ${TL}000 -s >> $O.log 2>&1 ;;
   gcs)     timeout $((TL+120)) $MZN --solver $GCS -D "$PAR" $MOD $IA --time-limit ${TL}000 -s >> $O.log 2>&1 ;;
   gcsP)    timeout $((TL+120)) $MZN --solver $GCS -D "$PAR" $MOD $IA --time-limit ${TL}000 -s \
              --prove --proof-files-basename $O >> $O.log 2>&1 ;;

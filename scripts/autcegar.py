@@ -19,7 +19,7 @@ import os, sys, subprocess, re, time
 out, dstr = sys.argv[1], sys.argv[2]
 solver = sys.argv[3] if len(sys.argv) > 3 else "chuffed"
 here = os.path.dirname(os.path.abspath(__file__))
-model = os.path.join(here, "..", "models", "aut.mzn")
+model = os.environ.get("MODEL", os.path.join(here, "..", "models", "aut.mzn"))   # e.g. models/heur/aut_max.mzn
 MZN = os.environ.get("MZN", "/scratch/arthur/mzn/MiniZincIDE-2.10.1-x86_64-linux-gnu/bin/minizinc")
 TL = int(os.environ.get("TL", "3600"))
 mindist = os.environ.get("MINDIST", os.path.join(here, "mindist"))

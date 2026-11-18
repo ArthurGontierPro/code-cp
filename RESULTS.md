@@ -307,7 +307,7 @@ solveur sont dans le tableau B-détail plus bas. ✔︎ veut dire « preuve vér
 | B4b | QR104 n'a aucun mot de poids ≤ 16 | idem | ❌ | UNKNOWN en 1 h, même avec découpage | c'est la limite actuelle du modèle CP. Le programme dédié `mindist` règle les quatre codes précédents en moins d'une seconde. |
 | B5 | P48q n'a aucun vecteur de norme ≤ 4 | `shortvec.mzn`, découpage en trois cas (voir l'en-tête du modèle) | 🔄 | UNSAT par Chuffed dans les trois cas (19 min, 16 min, 31 s). GCS ne conclut dans aucun cas en 1 h. Preuves en cours. | P48q est extrémal (minimum 6). C'est vrai sans preuve, et la certification est en cours. |
 | B5b | P48p n'a aucun vecteur de norme ≤ 4 | idem | ✅ sans preuve | UNSAT par Chuffed (55 min, 56 min, 3,5 min). GCS ne conclut pas. | P48p est extrémal. Certifier demandera un meilleur modèle ou beaucoup plus de temps. |
-| B6 | un [72,36,16] n'a pas d'automorphisme d'ordre 7 (Feulner et Nebe) | `aut.mzn` (structure F ⊕ E de l'article), un cas par dimension k de la partie C1 | 🔄 | k = 0, 1 UNSAT ✔︎ (baguette et GCS). k = 2 UNSAT en 4 s avec Chuffed, mais GCS et baguette ne concluent pas en 2 h. k = 3, 4, 5 donnent des codes de la relaxation dont la distance est < 16, et la boucle paresseuse tourne. | les cas faciles du théorème sont reproduits. Les cas k = 3 à 5 sont ceux où l'article a énuméré 70 millions de sous-codes, et c'est là que tout se joue. La brisure de symétrie LEX est admise. |
+| B6 | un [72,36,16] n'a pas d'automorphisme d'ordre 7 (Feulner et Nebe) | `aut.mzn` (structure F ⊕ E de l'article), un cas par dimension k de la partie C1 | 🔄 | k = 0, 1, 2 UNSAT ✔︎. Pour k = 2, baguette conclut en 5 s avec une preuve de 1 Mo si on branche sur les bits générateurs en essayant 1 d'abord (voir B-heur), et ne conclut pas en 30 min sinon. k = 3, 4, 5 donnent des codes de la relaxation dont la distance est < 16, et la boucle paresseuse tourne. | les cas faciles du théorème sont reproduits. Les cas k = 3 à 5 sont ceux où l'article a énuméré 70 millions de sous-codes, et c'est là que tout se joue. La brisure de symétrie LEX est admise. |
 | B7 | idem pour Z3×Z3, D10, l'ordre 6, Z4, Z2×Z2×Z2 | même schéma | ⏳ | | |
 | B8 | non-existence de (40,8,17) et (35,10,13) | `linear.mzn` + CNF de l'article AAAI | ❌ | Chuffed, GCS et Kissat UNKNOWN en 1 h | même Kissat ne conclut pas en 1 h. L'article lui donnait 24 h. On laisse de côté. |
 
@@ -329,7 +329,29 @@ solveur sont dans le tableau B-détail plus bas. ✔︎ veut dire « preuve vér
 | QR104, poids ≤ 16, avec découpage | > 3600 | > 3600 | | |
 | P48q, norme ≤ 4 (b=0 gauche, b=0 droite, b=1) | 1117, 983, 31 | > 3600 ×3 | en cours | en cours |
 | P48p, norme ≤ 4 (idem) | 3316, 3343, 210 | > 3600 ×3 | | |
-| ordre 7, k = 0 / 1 / 2 | 0,9 / 3,3 / 4,3 | 0,9 / 3,3 / > 3600 | ✔︎ / ✔︎ / > 7200 | ✔︎ / ✔︎ / > 7200 |
+| ordre 7, k = 0 / 1 / 2 | 0,9 / 3,3 / 4,3 | 0,9 / 3,3 / > 3600 | ✔︎ / ✔︎ / > 7200 | ✔︎ / ✔︎ / 5,2 avec `indomain_max`, 1 Mo, ✔︎ |
+
+### B-heur : l'effet de l'heuristique de branchement (2026-11-18, `bench/heur.sh`)
+
+| instance | recherche | Chuffed | baguette |
+|---|---|---|---|
+| QR48, une moitié | sans annotation | 23 668 nœuds, 0,6 s | 23 367 nœuds, 135 s |
+| | bits u dans l'ordre, 1 d'abord | 11 710 nœuds, 0,3 s | 23 429 nœuds, 92 s |
+| QR72, une moitié | sans annotation | 90 500 nœuds, 2,8 s | 75 750 nœuds, > 1800 s |
+| ordre 7, k = 2 | sans annotation | 11 nœuds, 0,01 s | 51 000 nœuds, > 1800 s |
+| | bits générateurs dans l'ordre, 0 d'abord | 16 millions de nœuds, > 1800 s | 48 000 nœuds, > 1800 s |
+| | bits générateurs dans l'ordre, 1 d'abord | 140 nœuds, 0,01 s | 158 nœuds, 5,2 s, preuve 1 Mo ✔︎ |
+
+Les temps de Chuffed sont ceux du solveur seul. L'aplatissement ajoute environ 4 s pour l'ordre 7.
+
+Sur les codes fixés, l'heuristique ne change presque rien. Baguette visite autant de nœuds que Chuffed,
+mais chaque nœud lui coûte environ 200 fois plus, et ce coût augmente avec le nombre de clauses
+apprises. Sur le modèle d'automorphismes, c'est le choix de la valeur qui décide, pour les deux
+solveurs. Essayer 1 d'abord résout le cas k = 2 en 150 nœuds, alors qu'essayer 0 d'abord ne finit
+pas en 30 min. L'écart qu'on attribuait à baguette venait donc de l'heuristique par défaut. Ces
+mesures, une étude d'heuristiques et l'oubli de clauses selon le LBD sont demandés à baguette dans
+son WORKLOG. Le baguette du nœud est une version ancienne (2c97b16), et il faudra refaire la mesure
+avec la version courante.
 
 Les tests de contrôle (SAT attendu) passent tous. On trouve un vecteur de norme 4 dans Leech, de norme 6
 dans P48p et P48q, et des mots de poids 12 et 16 dans QR48 et QR80, avec des preuves SAT vérifiées.
