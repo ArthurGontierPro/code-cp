@@ -340,12 +340,12 @@ dans P48p et P48q, et des mots de poids 12 et 16 dans QR48 et QR80, avec des pre
 |---|---|---|---|---|---|
 | C1 | existe-t-il un [72,36,16] avec un automorphisme d'ordre 5 ? | `aut.mzn`, type de cycles 5^14 1^2, relaxation K et boucle paresseuse | 🔄 | la relaxation K=2 rend en 3 h un code auto-dual doublement pair de distance 12, invariant par l'ordre 5. La boucle paresseuse tourne avec 4 h par tour. | rien de conclusif pour l'instant. SAT avec d=16 serait un résultat majeur. UNSAT réduirait le groupe à l'ordre 1, 2, 3 ou 4. |
 | C2 | idem pour l'ordre 3 (type 3^24) | idem | 🔄 | aucun tour n'aboutit en 4 h | probablement hors de portée. |
+| C3 | idem pour l'ordre 2 et pour Z2×Z2 | | ⏳ | | le modèle actuel ne traite que les ordres premiers impairs. |
 
 Note (2026-11-18). Une partie des « UNKNOWN » des boucles paresseuses (ordre 7, k = 3) n'étaient pas
 des timeouts. MiniZinc 2.10.1 plantait (segfault) en aplatissant le modèle quand les combinaisons
 paresseuses dépassaient environ 3500 ensembles d'une vingtaine de lignes. Le XOR de ces ensembles est
 maintenant écrit comme une parité linéaire, et les boucles sont relancées avec des tours de 8 h.
-| C3 | idem pour l'ordre 2 et pour Z2×Z2 | | ⏳ | | le modèle actuel ne traite que les ordres premiers impairs. |
 
 ## D. Plan C, les réseaux directement (modèle de Gram)
 
@@ -353,6 +353,31 @@ maintenant écrit comme une parité linéaire, et les boucles sont relancées av
 |---|---|---|---|---|---|
 | D1 | retrouver un réseau pair unimodulaire de dimension 24 et de minimum 4 | Gram variable, coupes paresseuses | mis de côté | | la contrainte det G = 1 n'est pas exprimable simplement en CP. Et en passant par un code, D1 se ramène à A1 (Golay donne Leech). Toute la littérature passe par les codes, et les résultats du bloc B montrent pourquoi. |
 | D2 | idem en dimension 48 avec un automorphisme imposé | idem | mis de côté | | même raison. |
+
+## E. Ce que les preuves admettent, et comment on le teste
+
+VeriPB prouve qu'un fichier `.opb` n'a pas de solution. Tout raccourci du modèle (un découpage, une
+borne de domaine, une brisure de symétrie) est écrit dans ce fichier comme un axiome, et le
+vérificateur ne peut pas savoir s'il est justifié. Une borne fausse d'une unité donnerait un UNSAT faux
+avec une preuve parfaitement vérifiée. Ce tableau liste ces axiomes et la façon dont on les teste.
+
+Le test principal est un test d'équivalence par énumération (`scripts/equivcount.py`, `bench/equiv.sh`).
+On prend une instance où la réponse est SAT et où le nombre exact de solutions est connu (énumérateur des
+poids d'un code, série thêta d'un réseau). On énumère toutes les solutions avec Chuffed, on les ramène aux
+coordonnées d'origine, et on vérifie deux choses. Le modèle complet doit donner exactement le nombre
+connu, sans doublon. Chaque découpage doit redonner l'ensemble de départ, avec des cas disjoints pour les
+cubes.
+
+| id | axiome | où il sert | justification | test | statut |
+|---|---|---|---|---|---|
+| E1 | l'instance est bien le code annoncé | B2 à B4b | calcul fini dans `gen_instances.py` (rang, auto-dual, doublement pair) | Golay donne 759 mots de poids 8, QR48 donne 17296 mots de poids 12 | Golay ✅ |
+| E2 | chercher jusqu'au poids d−4 suffit | B2 à B4b | le code est doublement pair, donc aucun poids entre d−3 et d−1 | calcul fini, vérifié dans `gen_instances.py` | ✅ |
+| E3 | les deux moitiés couvrent tous les mots | B3 à B4b | A·Aᵀ = I (vérifié en Python), et un mot de poids ≤ W a au plus W/2 uns d'un côté | moitié gauche ∪ moitié droite = modèle complet | Golay ✅ |
+| E4 | les cubes FIRST/SECOND/THIRD forment une partition | B4 | un script vérifie que les 2154 cas de QR80 couvrent l'arbre | sur tout l'arbre de profondeur 3, chaque nœud est l'union disjointe de ses fils | Golay ✅ (754 runs) |
+| E5 | le modèle décrit bien le réseau (construction B ou B3, translaté T, bornes W, Y et z) | B1, B5 | SPLAG ch. 5 et 7, bornes calculées à la main dans l'en-tête de `shortvec.mzn` | Leech donne 196560 vecteurs de norme 4 (98256 avec b=0, 98304 avec b=1), P48p et P48q donnent 52416000 vecteurs de norme 6 | 🔄 |
+| E6 | le découpage de P48 (b=0 coupé en deux moitiés, b=1) | B5 | même argument que E3 sur le mot y mod 3 | à la norme 6 avec HALF = 9, l'union des deux moitiés redonne tout le cas b=0 | 🔄 |
+| E7 | le théorème de structure, la forme systématique, le type de cycles, k ≤ c/2 et LEX | B6, C1, C2 | Huffman, Feulner–Nebe, Conway–Pless (papier). LEX pourrait être justifié dans VeriPB par la règle de dominance, si on l'écrit comme une permutation de littéraux. | le [48,24,12] est unique (QR48), avec Aut = PSL(2,47). Le modèle doit trouver un code pour l'ordre 3 (type 3^16) et l'ordre 23, et aucun pour les ordres 5, 7, 11, ni pour l'ordre 3 avec points fixes. En longueur 24, les tests sur Golay passent déjà (`notes/aut-order-p.md`). | 🔄 |
+| E8 | la chaîne mzn → fzn → opb | tout | non justifiée | les comptages passent par l'aplatissement pour Chuffed, qui n'est pas celui de baguette ni de GCS. Ils ne testent donc pas l'encodage `.opb`. | ⏳ |
 
 ## Ce qu'on retient (2026-11-17)
 
