@@ -230,8 +230,23 @@ Ce qui reste admis, et qu'on signale à chaque fois dans le tableau :
 - la **relaxation**. Pour la distance, on n'écrit parfois la contrainte que pour les combinaisons
   d'au plus K lignes. Un UNSAT de la relaxation reste un UNSAT du vrai problème. Un SAT, en revanche,
   ne prouve rien, et il faut vérifier le code trouvé.
+- la **traduction elle-même**. VeriPB vérifie que le fichier `.opb` n'a pas de solution, et ce
+  fichier vient du modèle MiniZinc par deux traductions (MiniZinc vers FlatZinc, puis FlatZinc vers
+  `.opb`). Si le modèle contient une borne fausse ou un découpage mal écrit, la preuve sera vérifiée
+  quand même, mais elle prouvera autre chose que ce qu'on croit. La section E de la partie 2 liste ces
+  axiomes un par un, avec le test qui les contrôle. On compte toutes les solutions sur une instance où
+  la réponse est connue, par exemple les 196560 vecteurs de norme 4 de Leech.
 
-## 7. Deux idées qui changent tout
+**Comment le solveur cherche.** Il fixe une variable à une valeur (une « décision »), propage les
+conséquences, et revient en arrière quand une contrainte est violée. Deux choix sont libres, la
+variable à fixer et la valeur à essayer d'abord. Ces choix ne changent pas la réponse, mais ils peuvent
+changer le temps de calcul du tout au tout. Sur le modèle d'automorphismes, essayer 1 avant 0 sur les
+bits des générateurs fait passer de plusieurs millions de nœuds à 150 (tableau B-heur). Un solveur
+apprend aussi de ses échecs, parce qu'à chaque contradiction il ajoute une clause qui interdit de
+retomber dans la même impasse. Garder toutes ces clauses finit par coûter cher, et la littérature SAT
+sait lesquelles oublier.
+
+## 7. Trois idées qui changent tout
 
 **L'argument des deux moitiés.** Dans un code auto-dual écrit [I | A], la matrice A est inversible
 (A·Aᵀ = I), donc le même code s'écrit aussi [Aᵀ | I]. Sur l'exemple fil rouge, un mot de poids ≤ 3 a au
@@ -247,14 +262,35 @@ La leçon générale est qu'un solveur ne trouve pas tout seul un argument math�
 comme celui-ci. Le lui donner sous forme de découpage en cas coûte une ligne de papier et fait gagner
 des ordres de grandeur.
 
-**Les automorphismes.** Un automorphisme d'un code est une permutation des coordonnées qui envoie le
-code sur lui-même. Les codes et réseaux connus ont presque tous beaucoup de symétries, et la méthode
-classique pour en chercher de nouveaux consiste à imposer un groupe de symétries, ce qui réduit
-énormément l'espace de recherche. Pour un code [72, 36, 16], une série d'articles (Nebe, Borello,
-Feulner, et d'autres) a montré que son groupe d'automorphismes est minuscule, d'ordre 1, 2, 3, 4 ou 5,
-ou le groupe Z2 × Z2. Chacune de ces exclusions est un calcul sur ordinateur, sans certificat. Les
-reproduire avec un journal de preuve, puis attaquer les cas encore ouverts (ordre 5, ordre 3), c'est
-l'objet des lignes B6 et C du tableau.
+**Les symétries d'un code connu.** Un automorphisme d'un code est une permutation des coordonnées qui
+envoie le code sur lui-même, donc un mot sur un mot de même poids. Le code de Hamming étendu [8, 4, 4]
+en a 1344, et ils forment un groupe 3-transitif, ce qui veut dire qu'on peut envoyer n'importe quel
+triplet de coordonnées sur n'importe quel autre. Conséquence, si un mot léger existe, il en existe un
+dont le support contient les coordonnées 1, 2 et 3, et on peut imposer ces trois 1 au solveur. Sur
+l'exemple, les 14 mots de poids 4 sont tels que trois coordonnées quelconques appartiennent à un seul
+d'entre eux. Imposer trois coordonnées laisse donc exactement un mot au lieu de 14. Les codes QR
+étendus ont la même propriété, parce que leur groupe contient PSL(2, p), qui est 3-homogène quand
+p ≡ 3 mod 4. Pour QR80, cela divise le travail par plus de vingt, et QR104, hors de portée sans cela,
+se résout (lignes B4b et B4c). On vérifie l'argument par comptage, avec 21 mots de poids 8 de Golay
+et 220 mots de poids 12 de QR48 qui contiennent un triplet donné, comme le prédit la théorie.
+
+**Les automorphismes imposés.** Pour chercher un code inconnu, on renverse l'idée. Au lieu d'utiliser
+les symétries d'un code qu'on a, on impose une symétrie au code qu'on cherche. Les codes et réseaux
+connus ont presque tous beaucoup de symétries, et c'est la méthode classique pour en trouver de
+nouveaux, parce qu'un code invariant par une permutation σ est décrit par beaucoup moins d'inconnues.
+Concrètement, `models/aut.mzn` fixe σ (par exemple 10 cycles de longueur 7 et 2 points fixes en
+longueur 72), et un théorème de structure découpe tout code invariant par σ en une partie fixée par σ
+et une partie qui se lit comme un code sur un corps fini (F8 pour l'ordre 7, F16 pour l'ordre 5). Le
+solveur cherche ces petites pièces, et la distance est imposée paresseusement. On résout, on calcule
+les mots trop légers du code obtenu, on les interdit, et on recommence.
+
+Pour un code [72, 36, 16], une série d'articles (Nebe, Borello, Feulner, et d'autres) a montré que son
+groupe d'automorphismes est minuscule, d'ordre 1, 2, 3, 4 ou 5, ou le groupe Z2 × Z2. Chacune de ces
+exclusions est un calcul sur ordinateur, sans certificat. Les reproduire avec un journal de preuve,
+puis attaquer les cas encore ouverts (ordre 5, ordre 3), c'est l'objet des lignes B6 et C du tableau.
+Avant de croire une réponse du modèle, on le teste en longueur 48, où l'on sait tout. Le seul code
+[48, 24, 12] est QR48, et son groupe PSL(2, 47) dit quels ordres σ doivent donner un code et lesquels
+n'en donnent aucun (ligne E7). Le modèle retrouve bien QR48 pour l'ordre 23.
 
 ## 8. Comment lire le tableau
 
@@ -289,7 +325,7 @@ Le nœud fataepyc-07 a 192 cœurs, donc tout ce qui est marqué ⏳ dans un mêm
 | A5 | trouver un [72,36,12] auto-dual | GCS + boucle paresseuse, BDC | ✅ | 2 à 3 min | facile, mais d=12 est loin de l'extrémal (16). |
 | A6 | [72,36,16] sous BDC | Chuffed, GCS | ❌ | pas de conclusion | impossible par construction, car la BDC a un automorphisme d'ordre 35 et la littérature exclut tout ordre > 5. |
 | A7 | benchmark AAAI-26 (51 codes linéaires) | linear.mzn | ✅ | Kissat 29/51 en 1 h, GCS 11, Chuffed 6, baguette 1 | sur ce type de problème, le SAT pur domine nos modèles CP. |
-| A8 | bug de `--time-limit` de baguette | dbg/ sur le nœud | ✅ | baguette dépasse sa limite d'environ 8 %, mais ses preuves sont complètes | les preuves illisibles venaient de notre timeout extérieur. Demande déposée dans WORKLOG. |
+| A8 | bug de `--time-limit` de baguette | dbg/ sur le nœud | ✅ | baguette dépasse sa limite d'environ 8 %, mais ses preuves sont complètes | les preuves illisibles venaient de notre timeout extérieur. Demande déposée dans WORKLOG, reprise par baguette comme tâche M6-T21. |
 
 ## B. Plan A, certifier des résultats connus
 
@@ -306,8 +342,8 @@ solveur sont dans le tableau B-détail plus bas. ✔︎ veut dire « preuve vér
 | B4 | QR80 n'a aucun mot de poids ≤ 12 | idem, puis chaque moitié découpée selon la 1re, la 2e, puis la 3e ligne choisie (cas disjoints, lancés en parallèle) | ✅ ✔︎ | 2154 preuves baguette vérifiées (52 cas au 1er niveau, 1152 au 2e, 950 au 3e). Un script vérifie que ces cas couvrent tous les mots. Au total 168 Go de preuves, 149 heures-cœur de résolution, 3,6 h de vérification. | QR80 a une distance de 16, avec un certificat. C'est le code qu'utilisent Stehlé et Watkins pour le réseau N80. Admis : le découpage en moitiés et en cas, chacun tenant en une ligne. |
 | B4c | QR80, avec les automorphismes | `minweight_fix.mzn` : deux moitiés, et trois coordonnées imposées dans le support, parce que PSL(2,p) est 3-homogène pour p ≡ 3 mod 4. Validé par comptage : 21 mots de poids 8 dans Golay et 220 de poids 12 dans QR48 par triplet, comme le veut le 3-design. | 🔄 | Le gain dépend de l'endroit où tombent les trois coordonnées. Avec les trois à gauche, la moitié gauche passe à 1,2 s avec Chuffed (au lieu de 523 s), et à 147 s avec baguette, preuve de 223 Mo ✔︎. La moitié droite, où ces coordonnées ne sont pas des variables de branchement, reste à 196 s. Avec deux coordonnées à gauche et une à droite, Chuffed met 7,6 s + 39,5 s, soit 47 s au lieu de 1048 s pour les deux moitiés. Baguette en cours avec ce triplet, et QR104 avec les deux triplets. | les symétries du code divisent le travail par plusieurs centaines. Admis : la 3-homogénéité (un théorème de groupes), en plus des deux moitiés. |
 | B4b | QR104 n'a aucun mot de poids ≤ 16 | `minweight_fix.mzn` : deux moitiés, puis trois coordonnées imposées (deux à gauche, une à droite), puis la moitié droite découpée selon la 2e ligne choisie (52 cas) | ✅ sans preuve | Chuffed : moitié gauche UNSAT en 32 min (GCS 50 min), moitié droite 52 cas UNSAT, 2,6 h au total, 25 min pour le plus long. Sans les automorphismes, rien en 1 h. | QR104 a une distance de 20, c'est le code extrémal de longueur 104 (valeur connue, retrouvée). Admis : la 3-homogénéité de PSL(2,103), en plus des moitiés et du découpage. La preuve baguette est l'étape suivante. |
-| B5 | P48q n'a aucun vecteur de norme ≤ 4 | `shortvec.mzn`, découpage en trois cas (voir l'en-tête du modèle) | 🔄 | UNSAT par Chuffed dans les trois cas (19 min, 16 min, 31 s). GCS ne conclut dans aucun cas en 1 h. Preuves en cours. | P48q est extrémal (minimum 6). C'est vrai sans preuve, et la certification est en cours. |
-| B5b | P48p n'a aucun vecteur de norme ≤ 4 | idem | ✅ sans preuve | UNSAT par Chuffed (55 min, 56 min, 3,5 min). GCS ne conclut pas. | P48p est extrémal. Certifier demandera un meilleur modèle ou beaucoup plus de temps. |
+| B5 | P48q n'a aucun vecteur de norme ≤ 4 | `shortvec.mzn`, découpage en trois cas (voir l'en-tête du modèle) | 🔄 | UNSAT par Chuffed dans les trois cas (19 min, 16 min, 31 s). GCS ne conclut dans aucun cas en 1 h, et ses preuves dépassent 200 Go. Baguette tourne depuis le 18/11 sur les trois cas, avec deux heuristiques et 48 h de limite (`bench/p48bag.sh`). | P48q est extrémal (minimum 6). C'est vrai sans preuve, et la certification est en cours. |
+| B5b | P48p n'a aucun vecteur de norme ≤ 4 | idem | ✅ sans preuve | UNSAT par Chuffed (55 min, 56 min, 3,5 min). GCS ne conclut pas. Baguette en cours, comme pour B5. | P48p est extrémal. Certifier demandera peut-être un meilleur modèle, par exemple les symétries du code ternaire comme pour B4c. |
 | B6 | un [72,36,16] n'a pas d'automorphisme d'ordre 7 (Feulner et Nebe) | `aut.mzn` (structure F ⊕ E de l'article), un cas par dimension k de la partie C1 | 🔄 | k = 0, 1, 2 UNSAT ✔︎. Pour k = 2, baguette conclut en 5 s avec une preuve de 1 Mo si on branche sur les bits générateurs en essayant 1 d'abord (voir B-heur), et ne conclut pas en 30 min sinon. k = 3, 4, 5 donnent des codes de la relaxation dont la distance est < 16, et la boucle paresseuse tourne. | les cas faciles du théorème sont reproduits. Les cas k = 3 à 5 sont ceux où l'article a énuméré 70 millions de sous-codes, et c'est là que tout se joue. La brisure de symétrie LEX est admise. |
 | B7 | idem pour Z3×Z3, D10, l'ordre 6, Z4, Z2×Z2×Z2 | même schéma | ⏳ | | |
 | B8 | non-existence de (40,8,17) et (35,10,13) | `linear.mzn` + CNF de l'article AAAI | ❌ | Chuffed, GCS et Kissat UNKNOWN en 1 h | même Kissat ne conclut pas en 1 h. L'article lui donnait 24 h. On laisse de côté. |
@@ -361,8 +397,8 @@ dans P48p et P48q, et des mots de poids 12 et 16 dans QR48 et QR80, avec des pre
 
 | id | question | méthode | statut | résultat | ce que ça veut dire |
 |---|---|---|---|---|---|
-| C1 | existe-t-il un [72,36,16] avec un automorphisme d'ordre 5 ? | `aut.mzn`, type de cycles 5^14 1^2, relaxation K et boucle paresseuse | 🔄 | la relaxation K=2 rend en 3 h un code auto-dual doublement pair de distance 12, invariant par l'ordre 5. La boucle paresseuse tourne avec 4 h par tour. | rien de conclusif pour l'instant. SAT avec d=16 serait un résultat majeur. UNSAT réduirait le groupe à l'ordre 1, 2, 3 ou 4. |
-| C2 | idem pour l'ordre 3 (type 3^24) | idem | 🔄 | aucun tour n'aboutit en 4 h | probablement hors de portée. |
+| C1 | existe-t-il un [72,36,16] avec un automorphisme d'ordre 5 ? | `aut.mzn`, type de cycles 5^14 1^2, relaxation K et boucle paresseuse | 🔄 | la relaxation K=2 rend en 3 h un code auto-dual doublement pair de distance 12, invariant par l'ordre 5. La boucle paresseuse tourne en deux versions, l'heuristique par défaut avec 8 h par tour, et « 1 d'abord » avec 1 h par tour, dont les tours durent quelques minutes. | rien de conclusif pour l'instant. SAT avec d=16 serait un résultat majeur. UNSAT réduirait le groupe à l'ordre 1, 2, 3 ou 4. |
+| C2 | idem pour l'ordre 3 (type 3^24) | idem | 🔄 | avec l'heuristique par défaut, aucun tour n'aboutit en 4 h. Avec « 1 d'abord », les tours durent environ 30 min, et les codes trouvés ont encore une distance de 8. | probablement hors de portée, mais à suivre. |
 | C3 | idem pour l'ordre 2 et pour Z2×Z2 | | ⏳ | | le modèle actuel ne traite que les ordres premiers impairs. |
 
 Note (2026-11-18). Une partie des « UNKNOWN » des boucles paresseuses (ordre 7, k = 3) n'étaient pas
@@ -398,7 +434,7 @@ cubes.
 | E3 | les deux moitiés couvrent tous les mots | B3 à B4b | A·Aᵀ = I (vérifié en Python), et un mot de poids ≤ W a au plus W/2 uns d'un côté | moitié gauche ∪ moitié droite = modèle complet | ✅ Golay (507 + 507 mots, union 759), QR48 (10915 + 10915, union 17296) |
 | E4 | les cubes FIRST/SECOND/THIRD forment une partition | B4 | un script vérifie que les 2154 cas de QR80 couvrent l'arbre | sur tout l'arbre de profondeur 3, chaque nœud est l'union disjointe de ses fils | ✅ Golay (754 runs), QR48 (5250 runs) |
 | E5 | le modèle décrit bien le réseau (construction B ou B3, translaté T, bornes W, Y et z) | B1, B5 | SPLAG ch. 5 et 7, bornes calculées à la main dans l'en-tête de `shortvec.mzn` | Leech donne 196560 vecteurs de norme 4 (98256 avec b=0, 98304 avec b=1), P48p et P48q donnent 52416000 vecteurs de norme 6 | Leech ✅ (196560 = 98256 + 98304, en 16 s). P48 🔄 |
-| E6 | le découpage de P48 (b=0 coupé en deux moitiés, b=1) | B5 | même argument que E3 sur le mot y mod 3 | à la norme 6 avec HALF = 9, l'union des deux moitiés redonne tout le cas b=0 | 🔄 |
+| E6 | le découpage de P48 (b=0 coupé en deux moitiés, b=1) | B5 | même argument que E3 sur le mot y mod 3 | à la norme 6 avec HALF = 9, l'union des deux moitiés redonne tout le cas b=0 | 🔄 (52 millions de vecteurs à énumérer, en cours depuis le 18/11) |
 | E7 | le théorème de structure, la forme systématique, le type de cycles, k ≤ c/2 et LEX | B6, C1, C2 | Huffman, Feulner–Nebe, Conway–Pless (papier). LEX pourrait être justifié dans VeriPB par la règle de dominance, si on l'écrit comme une permutation de littéraux. | le [48,24,12] est unique (QR48), avec Aut = PSL(2,47). Le modèle doit trouver un code pour l'ordre 3 (type 3^16) et l'ordre 23, et aucun pour les ordres 5, 7, 11, ni pour l'ordre 3 avec points fixes. En longueur 24, les tests sur Golay passent déjà (`notes/aut-order-p.md`). | 🔄 Ordre 23 ✅ : k = 0 UNSAT en 10 s, k = 1 FOUND après 50 tours de la boucle paresseuse (1 h 27), et le code trouvé a exactement l'énumérateur de QR48 (17296 mots de poids 12). Les autres cas tournent encore. Les boucles paresseuses ajoutent environ 40 combinaisons par tour et convergent lentement. |
 | E8 | la chaîne mzn → fzn → opb | tout | non justifiée | les comptages passent par l'aplatissement pour Chuffed, qui n'est pas celui de baguette ni de GCS. Ils ne testent donc pas l'encodage `.opb`. | ⏳ |
 
