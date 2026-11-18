@@ -418,6 +418,20 @@ cubes.
 - **Les limites actuelles.** QR104 en minweight. P48 avec preuve, où seul Chuffed conclut. Les cas
   k = 3 à 5 de l'ordre 7, qui ont demandé à Feulner et Nebe une énumération de 70 millions de codes.
 
+## Ce qu'on retient (2026-11-18)
+
+- **Les symétries du code valent plus que le solveur.** Pour un code QR, PSL(2,p) est 3-homogène. On
+  peut donc imposer trois coordonnées dans le support du mot cherché. QR80 passe de 2 × 523 s à 47 s
+  avec Chuffed, et QR104, hors de portée la veille, est résolu sans preuve (B4b). Le choix des trois
+  coordonnées compte. Celles qui tombent sur les variables de branchement aident beaucoup plus.
+- **L'heuristique décide du modèle d'automorphismes.** Essayer 1 d'abord sur les bits générateurs
+  résout l'ordre 7, k = 2 en 150 nœuds au lieu de millions, pour Chuffed comme pour baguette (B-heur).
+  Les boucles paresseuses de longueur 72 font maintenant des tours de quelques minutes au lieu de 8 h.
+- **Sur les codes fixés, baguette perd sur le coût par nœud**, à nombre de nœuds égal. C'est demandé
+  à baguette, avec une étude d'heuristiques, l'oubli de clauses par LBD et les redémarrages.
+- **Les tests d'équivalence par énumération passent** pour Golay, QR48 et Leech (section E). Ils ont
+  aussi trouvé un trou dans la bibliothèque MiniZinc de baguette (`bool_xor` avec une constante).
+
 ## Ce qu'on ne fera pas, et pourquoi
 
 | cible | raison |
