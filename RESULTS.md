@@ -303,7 +303,7 @@ solveur sont dans le tableau B-détail plus bas. ✔︎ veut dire « preuve vér
 | B2 | Golay n'a aucun mot de poids 4 | `minweight.mzn`, code fixé | ✅ ✔︎ | moins d'une seconde pour tous les solveurs, preuves de quelques Mo | Golay a bien une distance de 8. |
 | B3 | QR48 n'a aucun mot de poids ≤ 8 | `minweight.mzn`, puis découpage en deux moitiés | ✅ ✔︎ | sans découpage, preuve GCS de 32 Go. Avec découpage, 2 × 3 s et 2 × 360 Mo (GCS), 2 × 2,5 min et 2 × 143 Mo (baguette). | QR48 a une distance de 12, c'est le code extrémal de longueur 48. |
 | B3b | QR72 n'a aucun mot de poids ≤ 8 | idem | ✅ ✔︎ | sans découpage, la preuve GCS dépasse 200 Go. Avec découpage, GCS 2 × 35 s et 2 × 4 Go, baguette 2 × 66 min et 2 × 1 Go. | distance ≥ 12 (QR72 n'est pas extrémal, il lui faudrait 16). Sert d'échelon de difficulté. |
-| B4 | QR80 n'a aucun mot de poids ≤ 12 | idem, puis chaque moitié découpée selon la 1re, la 2e, puis la 3e ligne choisie (cas disjoints, lancés en parallèle) | 🔄 | Chuffed règle les 80 cas du premier niveau (86 s au plus chacun). Avec baguette, 52 cas sur 80 sont certifiés au premier niveau et 1152 sur 1178 au deuxième (125 Go de preuves au total, 1,1 Go au plus par cas). Il reste 26 cas, redécoupés au troisième niveau, qui tournent. | QR80 a une distance de 16 (vrai sans preuve). La certification sera complète quand les 26 derniers cas seront fermés. |
+| B4 | QR80 n'a aucun mot de poids ≤ 12 | idem, puis chaque moitié découpée selon la 1re, la 2e, puis la 3e ligne choisie (cas disjoints, lancés en parallèle) | ✅ ✔︎ | 2154 preuves baguette vérifiées (52 cas au 1er niveau, 1152 au 2e, 950 au 3e). Un script vérifie que ces cas couvrent tous les mots. Au total 168 Go de preuves, 149 heures-cœur de résolution, 3,6 h de vérification. | QR80 a une distance de 16, avec un certificat. C'est le code qu'utilisent Stehlé et Watkins pour le réseau N80. Admis : le découpage en moitiés et en cas, chacun tenant en une ligne. |
 | B4b | QR104 n'a aucun mot de poids ≤ 16 | idem | ❌ | UNKNOWN en 1 h, même avec découpage | c'est la limite actuelle du modèle CP. Le programme dédié `mindist` règle les quatre codes précédents en moins d'une seconde. |
 | B5 | P48q n'a aucun vecteur de norme ≤ 4 | `shortvec.mzn`, découpage en trois cas (voir l'en-tête du modèle) | 🔄 | UNSAT par Chuffed dans les trois cas (19 min, 16 min, 31 s). GCS ne conclut dans aucun cas en 1 h. Preuves en cours. | P48q est extrémal (minimum 6). C'est vrai sans preuve, et la certification est en cours. |
 | B5b | P48p n'a aucun vecteur de norme ≤ 4 | idem | ✅ sans preuve | UNSAT par Chuffed (55 min, 56 min, 3,5 min). GCS ne conclut pas. | P48p est extrémal. Certifier demandera un meilleur modèle ou beaucoup plus de temps. |
@@ -325,6 +325,7 @@ solveur sont dans le tableau B-détail plus bas. ✔︎ veut dire « preuve vér
 | QR80, avec découpage (par moitié) | 524 | 713 | preuve > 200 Go | > 7200 |
 | QR80, moitiés × 1re ligne (80 cas) | ≤ 86 par cas | | | 52 cas ✔︎, les cas 1re ligne ≤ 14 > 3 h |
 | QR80, × 2e ligne (1178 cas) | | | | 1152 cas ✔︎, 26 cas > 2 h |
+| QR80, × 3e ligne pour ces 26 (950 cas) | | | | 950 cas ✔︎. QR80 complet. |
 | QR104, poids ≤ 16, avec découpage | > 3600 | > 3600 | | |
 | P48q, norme ≤ 4 (b=0 gauche, b=0 droite, b=1) | 1117, 983, 31 | > 3600 ×3 | en cours | en cours |
 | P48p, norme ≤ 4 (idem) | 3316, 3343, 210 | > 3600 ×3 | | |
@@ -356,7 +357,8 @@ maintenant écrit comme une parité linéaire, et les boucles sont relancées av
 ## Ce qu'on retient (2026-11-17)
 
 - **Ce qui marche.** Avec le bon modèle, on certifie l'extrémalité de Leech et la distance des codes
-  de Golay, QR48 et QR72. La seule chose admise est le découpage en deux moitiés, qui tient en une
+  de Golay, QR48, QR72 et QR80. Pour QR80, il a fallu découper en 2154 cas indépendants, ce qui
+  rend la certification parallèle. La seule chose admise est le découpage en deux moitiés, qui tient en une
   ligne sur papier. Les preuves font de quelques Mo à 4 Go, et VeriPB les vérifie en quelques minutes.
 - **Ce qui décide de tout, c'est le modèle.** Le découpage en deux moitiés divise les temps par 10 à
   50 et les preuves par 100. Le solveur ne trouve pas seul cet argument.
