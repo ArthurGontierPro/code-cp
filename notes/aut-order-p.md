@@ -153,3 +153,7 @@ sound but wasteful. `autcegar.py` rebuilds both candidates and keeps the light o
   (with their info cycles) and of E2 rows. These images exclude the symmetric copies of the
   current solution in advance. Rounds then add about 300 sets instead of 42. Whether this
   converges faster is being measured on the length-48 cases (`results/equiv/*_img.log`).
+
+**Stopped 2026-11-18 evening.** None of the lazy loops (length 48 tests, orders 7, 5 and 3 at 72,
+order 5 at 96) got past d = 8, except order 7, k = 5 at 72 (d = 12). IMG made no visible
+difference. The monolithic lazy loop does not scale; next step is the Feulner–Nebe decomposition.

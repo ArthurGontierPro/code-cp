@@ -29,14 +29,15 @@ tourne et ce qui vient ensuite.
 - La certification de P48 par baguette (`bench/p48bag.sh`) et ses tests d'équivalence (52 millions de
   vecteurs).
 - La preuve baguette de QR104 et de QR80 avec les symétries du code (`bench/fix.sh`, `c104rbag.sh`).
-- Le modèle d'automorphismes. Ordre 7 en longueur 72 (reproduire Feulner–Nebe), ordres 5 et 3 (la
-  question ouverte), et les tests en longueur 48 où la réponse est connue.
+- Les boucles paresseuses du modèle d'automorphismes sont arrêtées (18/11). Elles ne convergeaient
+  pas, même en longueur 48. Seul l'ordre 23 en longueur 48 a abouti, et il retrouve QR48.
 
 ## Ensuite
 
-- **R4. Le [72, 36, 16] par ses automorphismes.** Finir l'ordre 7 (k = 3, 4, 5), puis l'ordre 5. Faire
-  converger la boucle paresseuse plus vite, par exemple en ajoutant les images des mots légers par les
-  symétries du modèle (option `IMG` de `autcegar.py`, en test).
+- **R4. Le [72, 36, 16] par ses automorphismes.** Remplacer la boucle paresseuse monolithique par la
+  décomposition de Feulner et Nebe : énumérer les codes composants (C1 sur F8 avec d(C1) ≥ 4 et
+  d(C1⊥) ≥ 4), puis les recoller, chaque étape étant un problème CP borné et certifiable. D'abord
+  l'ordre 7 en 72 (reproduire leur théorème), puis l'ordre 5 en 72 et en 96 (`notes/length96.md`).
 - **R5. La chaîne de confiance.** Pour l'instant on teste la faisabilité et on comprend ce qu'on fait.
   Si un résultat en vaut la peine, on le refera avec la chaîne complète, c'est-à-dire des découpages et
   des symétries justifiés dans la preuve, puis la vérification par CakePB.

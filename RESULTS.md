@@ -400,8 +400,8 @@ dans P48p et P48q, et des mots de poids 12 et 16 dans QR48 et QR80, avec des pre
 
 | id | question | méthode | statut | résultat | ce que ça veut dire |
 |---|---|---|---|---|---|
-| C1 | existe-t-il un [72,36,16] avec un automorphisme d'ordre 5 ? | `aut.mzn`, type de cycles 5^14 1^2, relaxation K et boucle paresseuse | 🔄 | la relaxation K=2 rend en 3 h un code auto-dual doublement pair de distance 12, invariant par l'ordre 5. La boucle paresseuse tourne en deux versions, l'heuristique par défaut avec 8 h par tour, et « 1 d'abord » avec 1 h par tour, dont les tours durent quelques minutes. | rien de conclusif pour l'instant. SAT avec d=16 serait un résultat majeur. UNSAT réduirait le groupe à l'ordre 1, 2, 3 ou 4. |
-| C2 | idem pour l'ordre 3 (type 3^24) | idem | 🔄 | avec l'heuristique par défaut, aucun tour n'aboutit en 4 h. Avec « 1 d'abord », les tours durent environ 30 min, et les codes trouvés ont encore une distance de 8. | probablement hors de portée, mais à suivre. |
+| C1 | existe-t-il un [72,36,16] avec un automorphisme d'ordre 5 ? | `aut.mzn`, type de cycles 5^14 1^2, relaxation K et boucle paresseuse | 🔄 | la relaxation K=2 rend en 3 h un code auto-dual doublement pair de distance 12, invariant par l'ordre 5. Arrêté le 18/11. Aucune des deux versions de la boucle paresseuse (heuristique par défaut, ou « 1 d'abord ») n'a dépassé la distance 8 après une journée. | rien de conclusif pour l'instant. SAT avec d=16 serait un résultat majeur. UNSAT réduirait le groupe à l'ordre 1, 2, 3 ou 4. |
+| C2 | idem pour l'ordre 3 (type 3^24) | idem | ❌ | arrêté le 18/11. Avec l'heuristique par défaut, aucun tour n'aboutit en 4 h. Avec « 1 d'abord », les tours durent environ 30 min, et les codes trouvés gardent une distance de 8. | hors de portée de la boucle paresseuse. |
 | C3 | idem pour l'ordre 2 et pour Z2×Z2 | | ⏳ | | le modèle actuel ne traite que les ordres premiers impairs. |
 
 Note (2026-11-18). Une partie des « UNKNOWN » des boucles paresseuses (ordre 7, k = 3) n'étaient pas
@@ -470,6 +470,13 @@ cubes.
   à baguette, avec une étude d'heuristiques, l'oubli de clauses par LBD et les redémarrages.
 - **Les tests d'équivalence par énumération passent** pour Golay, QR48 et Leech (section E). Ils ont
   aussi trouvé un trou dans la bibliothèque MiniZinc de baguette (`bool_xor` avec une constante).
+
+- **La boucle paresseuse ne passe pas à l'échelle** (arrêtée le 18/11). Même en longueur 48, où la
+  réponse est connue, l'ordre 7 reste à des codes de distance 8 après 145 tours. Chaque tour n'interdit
+  qu'une quarantaine de combinaisons, et les images par symétrie (`IMG`) n'y changent rien de visible.
+  En 72, seul l'ordre 7 avec k = 5 a atteint la distance 12. La voie suivante est celle de Feulner et
+  Nebe : énumérer d'abord les petits codes composants avec un élagage fort, puis les recoller, chaque
+  étape étant un problème borné.
 
 ## Ce qu'on ne fera pas, et pourquoi
 
