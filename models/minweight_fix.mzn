@@ -18,4 +18,6 @@ include "minweight.mzn";
 set of int: FIXU;
 set of int: FIXC;
 constraint forall(i in FIXU)(u[i]);
-constraint forall(j in FIXC)(c[j]);
+% écrit comme une somme : « c[j] = true » fait produire à MiniZinc 2.10.1 des bool_xor(x, y, true)
+% que la bibliothèque de baguette (2c97b16 et main du 2026-11-18) ne redéfinit pas
+constraint sum(j in FIXC)(bool2int(c[j])) >= card(FIXC);
