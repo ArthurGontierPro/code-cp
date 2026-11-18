@@ -31,6 +31,7 @@ L'exemple à quatre bits de `notes/dominance/` explique la règle de dominance.
 | Hamming, poids ≤ 4 (SAT) | 0,01 s | ✅ SAT | refusé |
 | Golay, poids ≤ 4 (UNSAT) | 0,12 s, 20 nœuds (203 sans les clauses) | ✅ UNSAT en 0,34 s, 66 lignes dom, 10 Mo | refusé |
 | Golay, poids ≤ 8 (SAT) | 0,12 s | ✅ SAT en 0,30 s | refusé |
+| QR48, poids ≤ 8 (UNSAT) | 94 s, 1 205 nœuds | ✅ UNSAT en 4 min 30 environ, 138 lignes dom, 834 Mo (dont 500 Mo de témoins) | refusé à la 1re ligne dom |
 
 Un seul témoin faux (`BAD=k`) est refusé sur la première ligne de chaque bloc et accepté sur les
 dernières. Ce n'est pas un trou. À la fin d'un bloc, les clauses déjà dérivées ne laissent que
@@ -39,8 +40,8 @@ clause découle des autres par propagation (RUP) sans avoir besoin du témoin.
 
 ## Ce qui reste
 
-- Les témoins écrivent toutes les variables déplacées (3024 par ligne pour Golay), d'où 10 Mo de
-  preuve pour 66 lignes. Pour QR48 (17296 mots) ce sera environ 70 000 par ligne.
+- Les témoins écrivent toutes les variables déplacées, 1536 par ligne pour Golay et 69 024 pour
+  QR48, d'où 500 Mo de témoins sur QR48. Ce n'est pas encore ce qui limite.
 - Le modèle symétrique a une contrainte par mot de poids minimal. Il reste à mesurer s'il tient
   la comparaison avec la forme systématique sur QR48 et QR80.
 - Les deux autres preuves à lex de la piste 7 (AAAI-26 `linear.mzn`, `aut.mzn` avec LEX) restent
