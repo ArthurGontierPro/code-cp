@@ -11,3 +11,7 @@ results/runs/
 papers/
 mindist
 fzn/*.fzn
+dom/*.dzn
+dom/*.json
+dom/*.sol*
+dom/*.err*

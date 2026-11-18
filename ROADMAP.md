@@ -74,8 +74,8 @@ Chaîne de confiance
 7. Justifier la fixation de trois coordonnées (minweight_fix) par la règle de dominance de VeriPB,
    avec les automorphismes de PSL(2, p) comme témoins. La difficulté connue est que l'encodage actuel
    (forme systématique, chaînes de XOR) n'est pas symétrique, donc l'image d'une contrainte par un
-   automorphisme du code n'est pas une contrainte de la base. À essayer d'abord à la main sur
-   Hamming [8, 4, 4].
+   automorphisme du code n'est pas une contrainte de la base. Fait le 18/11 sur Hamming et Golay
+   avec un modèle symétrique et les preuves de baguette, en une seule preuve VeriPB (`dom/`).
 8. Recoller les cas et les moitiés par des conclusions ¬cube et un fichier qui les combine.
 
 Ordre proposé : 7, puis 1, avec 4 en parallèle côté baguette. 2 et 6 font de bons sujets d'étudiant.
