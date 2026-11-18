@@ -302,6 +302,9 @@ n'en donnent aucun (ligne E7). Le modèle retrouve bien QR48 pour l'ordre 23.
   versions avec preuve (GCS, baguette, puis `veripb`) que si c'est le cas.
 - `pbp_MB` est la taille du journal de preuve, `vwall` le temps de vérification. Une ligne n'est
   **certifiée** que si VeriPB a écrit `VERIFIED`.
+- Depuis le 18/11, chaque run garde sur le nœud le FlatZinc et le `.opb` qu'il a résolus
+  (`results/runs/LABEL.fzn.gz` et `LABEL.opb.gz`), parce qu'ils font partie de ce qu'il faut croire.
+  `fzn/make.sh` les régénère sur le portable pour les lire.
 
 ---
 
