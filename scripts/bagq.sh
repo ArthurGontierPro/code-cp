@@ -1,4 +1,5 @@
 #!/bin/bash
+# HISTORIQUE (16/11) : première journée, ancien dossier /scratch/arthur/golay du nœud, modèle code.mzn ou golay.mzn. Gardé pour reproduire STATUS.md (16/11).
 # bagq.sh SECONDS "LABEL|DZN|FLAGS" ... -- flatten code.mzn for baguette, solve with
 # proof, check with veripb; one line per variant. Output in /scratch/arthur/golay/bq/LABEL.*
 G=/scratch/arthur/golay; M=/scratch/arthur/mzn/MiniZincIDE-2.10.1-x86_64-linux-gnu/bin/minizinc

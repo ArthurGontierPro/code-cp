@@ -4,10 +4,15 @@
 Writes, for each object, a .dzn for the matching model and checks on the way that the
 object is what we claim (self-duality, doubly-even, unimodularity conditions).
 
-  codes (models/minweight.mzn):  golay24, qr48, qr80   binary extended QR codes [p+1,(p+1)/2]
+  codes (models/minweight.mzn):  golay24, qr48, qr72, qr80, qr104   binary extended QR codes
+        [p+1,(p+1)/2], p = 23, 47, 71, 79, 103. X.dzn is the systematic form [I | A], X_T.dzn
+        the same code as [I | A^T] with the halves swapped (valid because A.A^T = I, asserted
+        here); X.bits is A for mindist.c.
   lattices (models/shortvec.mzn): leech  = 2B(Golay) U (2B(Golay) + (-3,1^23))      norm w.w/8
                                   p48p   = B3(Pless symmetry code q=23), doubled      norm w.w/12
                                   p48q   = B3(ternary extended QR code p=47), doubled norm w.w/12
+        p48X_L.dzn / p48X_R.dzn: systematic forms [I | A] and, halves swapped, [I | -A^T] (ternary,
+        A.A^T = -I), with T permuted alike; they serve the b = 0 two-halves split (shortvec header).
 
 Lattice convention (both): w = 2*y + b*T, y = u*G + p*z (so y = a codeword mod p), sum(y) = 0 mod Q,
 b in {0,1}. Leech: p=2, Q=4, T=(-3,1^23), D=8 (SPLAG ch.4 §11, Construction B then the translate).

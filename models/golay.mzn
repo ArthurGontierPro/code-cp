@@ -7,6 +7,8 @@
 %  et contient l'explication complète (codes, poids, forme systématique, options), est
 %  code.mzn. Ce fichier-ci en est le cas particulier n = 12, d = 8.
 %
+%  STATUT (18/11) : historique, voir l'en-tête de code.mzn.
+%
 %  EN DEUX MOTS
 %  On cherche 12 mots de 24 bits (les lignes de la matrice génératrice [I_12 | A]) tels
 %  que les 4096 mots obtenus en les combinant par XOR forment un code :

@@ -132,3 +132,24 @@ them. That is a run for you to launch.
 rather than of [I | A] (`s = side == 0 ? l : r`). `cegar.py` reads every light line as rows
 of [I | A], so on that side it constrains a different (and possibly not light) word. That is
 sound but wasteful. `autcegar.py` rebuilds both candidates and keeps the light one.
+
+## 2026-11-18: heuristics, length-48 tests, faster lazy loops
+
+- **The value order decides.** Order 7, k = 2 at length 72: with the annotation
+  `bool_search(A0 ++ M, input_order, indomain_max)` (generator bits, 1 first; file
+  `models/heur/aut_max.mzn`, made by `bench/heur.sh`) Chuffed needs 140 nodes and baguette 158
+  nodes, 5 s, a 1 MB proof, VERIFIED. With `indomain_min`, Chuffed runs 16 M nodes without
+  finishing in 30 min, and baguette's default (first-fail, 0 first) does not finish either.
+  `autcegar.py` takes `MODEL=models/heur/aut_max.mzn`, and the length-72 loops (`bench/aut3.sh`)
+  now run rounds of minutes instead of 8 h.
+- **Length-48 ground truth** (`bench/equiv.sh`). The [48,24,12] code is unique (QR48, Houghten,
+  Lam, Thiel, Parker 2003) and Aut = PSL(2,47), of order 2^4·3·23·47. Its elements of order 3 have
+  no fixed point (3^16), those of order 23 have type 23^2 1^2. So the model must give a code for
+  p = 23 and for p = 3 with type 3^16, and none for p = 5, 7, 11 or for p = 3 with fixed points.
+  Result so far: p = 23, k = 0 UNSAT (10 s), k = 1 FOUND after 50 lazy rounds, and autcheck gives
+  exactly the weight enumerator of QR48. The other cases are still running: their first
+  rounds hit the 1 h limit, or the relaxed codes are still at d = 8.
+- **IMG.** `IMG=1` adds, for every light set, its images under the transpositions of E1 rows
+  (with their info cycles) and of E2 rows. These images exclude the symmetric copies of the
+  current solution in advance. Rounds then add about 300 sets instead of 42. Whether this
+  converges faster is being measured on the length-48 cases (`results/equiv/*_img.log`).

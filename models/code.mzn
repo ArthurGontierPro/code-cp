@@ -2,6 +2,12 @@
 %  À la recherche du code de Golay (et de son grand frère de longueur 48)
 % =========================================================================================
 %
+%  STATUT (18/11). C'est le modèle de la première journée (16/11) : la matrice génératrice est
+%  l'inconnue. Il retrouve Golay en quelques secondes, mais pas QR48 sans hypothèse de forme.
+%  La suite du projet a pris deux autres chemins : vérifier des codes FIXÉS (minweight.mzn) et
+%  chercher des codes sous un automorphisme imposé (aut.mzn). Ce fichier reste la meilleure
+%  introduction à la formule « poids = |S| + poids(XOR des lignes de A) ».
+%
 %  1. CE QU'ON CHERCHE
 %  -------------------
 %  Un CODE BINAIRE est un ensemble de mots de bits, tous de la même longueur, qu'on

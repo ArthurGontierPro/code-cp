@@ -1,4 +1,5 @@
 #!/bin/bash
+# HISTORIQUE (16/11) : première journée, ancien dossier /scratch/arthur/golay du nœud, modèle code.mzn ou golay.mzn. Gardé pour reproduire STATUS.md (16/11).
 # Lengths 72 and 96 under the BDC hypothesis, Chuffed and GCS in parallel (2026-11-16).
 cd /scratch/arthur/golay
 for N in 36 48; do for K in 1 2 3; do python3 subsets.py $N $K > s${N}_$K.dzn; done; done

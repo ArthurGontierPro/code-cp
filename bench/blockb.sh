@@ -1,4 +1,6 @@
 #!/bin/bash
+# Lancé le 17/11 avec la version de minweight.mzn d'alors, où FIRST/SECOND/THIRD étaient facultatifs.
+# Pour le relancer, ajouter FIRST=0;SECOND=0;THIRD=0; aux paramètres manquants.
 # blockb.sh -- RESULTS.md block B. Phase 1: chuffed + gcs without proof (TL1). Phase 2, per
 # instance, only if a no-proof solver concluded within TL1/2: GCS with proof and baguette
 # (always proof), both checked by veripb (TL2). Everything in parallel; one line per run in

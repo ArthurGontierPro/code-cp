@@ -1,4 +1,6 @@
 #!/bin/bash
+# Lancé le 17/11 avec la version de minweight.mzn d'alors, où FIRST/SECOND/THIRD étaient facultatifs.
+# Pour le relancer, ajouter FIRST=0;SECOND=0;THIRD=0; aux paramètres manquants.
 # blockb2.sh -- B2-B4 again with the two-halves split (models/minweight.mzn, HALF = Wmax/2),
 # one instance per side (X.dzn and X_T.dzn). Same phases as blockb.sh.
 cd /scratch/arthur/codes-cp

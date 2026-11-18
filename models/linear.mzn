@@ -4,6 +4,10 @@
 %  (voir notes/golay-leech-model.md, section "Comparison with ... AAAI-26", et leur
 %   external/AAAI-2026-Codes/Encodings/constraint_encoding.py, que ce modèle reproduit)
 %
+%  STATUT (18/11) : sert au benchmark AAAI-26 (RESULTS.md, ligne A7, et bench/job.sh). Kissat
+%  y domine nos solveurs CP : sur ce type de problème, pur SAT et sans structure exploitable,
+%  la CP n'a pas d'avantage.
+%
 %  On cherche k mots de longueur n (la génératrice G = [I_k | A], A de taille k × (n-k))
 %  tels que tout mot non nul du code ait au moins d bits à 1. Contrairement à code.mzn,
 %  il n'y a pas d'auto-dualité : seule la distance compte.

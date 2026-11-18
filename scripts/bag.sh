@@ -1,4 +1,5 @@
 #!/bin/bash
+# HISTORIQUE (16/11) : première journée, ancien dossier /scratch/arthur/golay du nœud, modèle code.mzn ou golay.mzn. Gardé pour reproduire STATUS.md (16/11).
 # bag.sh NAME FZN SECONDS proof|noproof -- baguette (and veripb if proof) on the node.
 # Output in /scratch/arthur/golay/runs/NAME: out, err (stats + rss/wall), vout.
 B=/scratch/arthur/golay/baguette/_build/default/bin/main.exe

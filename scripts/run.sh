@@ -1,4 +1,5 @@
 #!/bin/bash
+# HISTORIQUE (16/11) : première journée, ancien dossier /scratch/arthur/golay du nœud, modèle code.mzn ou golay.mzn. Gardé pour reproduire STATUS.md (16/11).
 # run.sh NAME FZN TIMELIMIT -- on the node, in /scratch/arthur/golay/runs/NAME
 B=/scratch/arthur/golay/baguette/_build/default/bin/main.exe
 D=/scratch/arthur/golay/runs/$1; mkdir -p $D; cp $2 $D/m.fzn; cd $D

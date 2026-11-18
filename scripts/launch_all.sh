@@ -1,4 +1,5 @@
 #!/bin/bash
+# HISTORIQUE (16/11) : première journée, ancien dossier /scratch/arthur/golay du nœud, modèle code.mzn ou golay.mzn. Gardé pour reproduire STATUS.md (16/11).
 # Every lead of 2026-11-16 afternoon, in parallel. One result file per lead.
 cd /scratch/arthur/golay
 for N in 12 24; do for K in 1 2 3 4; do python3 subsets.py $N $K > s${N}_$K.dzn; done; done

@@ -6,9 +6,17 @@
 %      |u|  +  poids(XOR des lignes de A choisies).
 %  Question : existe-t-il un mot non nul de poids ≤ Wmax ?
 %    - Wmax = d - 4 (le poids est multiple de 4 dans un code doublement pair) : on attend
-%      UNSAT, ce qui certifie la distance minimale d (Golay 8, QR48 12, QR80 16) ;
+%      UNSAT, ce qui certifie la distance minimale d (Golay 8, QR48 et QR72 12, QR80 16,
+%      QR104 20) ;
 %    - Wmax = d : on attend SAT, ce qui teste le modèle.
 %  Pas de brisure de symétrie : la preuve d'UNSAT n'admet aucune hypothèse.
+%
+%  Pour le cours : RESULTS.md §4 (le code de Hamming [8,4,4] traité à la main avec ce modèle),
+%  §6 (ce que veut dire UNSAT) et §7 (les deux moitiés). Les découpages sont testés par
+%  énumération (RESULTS.md, section E, lignes E3 et E4) : sur Golay et QR48, les deux moitiés
+%  redonnent exactement les 759 et 17296 mots de poids minimal, et chaque cas FIRST / SECOND /
+%  THIRD est l'union disjointe de ses sous-cas. Variante avec des coordonnées imposées par les
+%  symétries du code : minweight_fix.mzn.
 % =========================================================================================
 
 int: k;  int: m;

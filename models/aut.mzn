@@ -110,6 +110,18 @@
 %     nE, E   : combinaisons de lignes de G ajoutées une par une par ../scripts/autcegar.py
 %               (distance paresseuse, comme cegar.py pour code.mzn). Sinon "nE=0;E=[];".
 %  Vérification indépendante d'une solution : python3 ../scripts/autcheck.py p c f < sortie
+%
+%  7. CE QU'ON A APPRIS EN LE FAISANT TOURNER (18/11)
+%  ------------------------------------------------
+%   - L'heuristique compte plus que tout. Sans annotation, baguette branche sur la plus petite
+%     valeur, 0 d'abord, et ne finit pas l'ordre 7, k = 2 en 30 min. En branchant sur A0 puis
+%     M, 1 d'abord (models/heur/aut_max.mzn, produit par bench/heur.sh), il le finit en 158
+%     nœuds et 5 s, avec une preuve de 1 Mo. Chuffed se comporte de la même façon.
+%   - La relaxation K seule ne suffit pas à d ≥ 12. Les mots qui mélangent les composantes F,
+%     E1 et E2 lui échappent, et c'est la boucle paresseuse qui les rattrape.
+%   - Le modèle est testé en longueur 48, où le seul [48,24,12] est QR48, de groupe PSL(2,47)
+%     (RESULTS.md, ligne E7). Il retrouve QR48 pour l'ordre 23 (k = 1), et dit UNSAT pour
+%     k = 0, comme il se doit. Les cas qui doivent être UNSAT (ordres 5, 7, 11) tournent encore.
 % =========================================================================================
 
 include "lex_greater.mzn";

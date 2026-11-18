@@ -3,6 +3,11 @@
 Status: idea, nothing implemented. Written 2026-11-16 at Arthur's request, after a
 conversation about the Monster group, the Leech lattice and extremal lattices.
 
+Update 2026-11-18. This is the note of the first day, kept for its bibliography and its
+comparison with the AAAI-26 paper. Model A became `models/code.mzn`; the project then moved to
+fixed codes (`minweight.mzn`), lattices built from codes (`shortvec.mzn`, which replaces the Gram
+model B) and imposed automorphisms (`aut.mzn`). For the current state read `RESULTS.md`.
+
 ## Why
 
 Highly symmetric, rigid combinatorial objects. Uniqueness proofs (UNSAT after symmetry

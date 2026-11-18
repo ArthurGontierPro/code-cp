@@ -1,4 +1,6 @@
-"""cegar.py OUT N d K FLAGS  (SOLVER=... in the environment, default chuffed) -- lazy distance: solve code.mzn with combinations <= K,
+"""HISTORIQUE (16/11) : première journée, ancien dossier /scratch/arthur/golay du nœud, modèle code.mzn ou golay.mzn. Gardé pour reproduire STATUS.md (16/11).
+
+cegar.py OUT N d K FLAGS  (SOLVER=... in the environment, default chuffed) -- lazy distance: solve code.mzn with combinations <= K,
 compute the code's minimum-weight word, and if it is below d add that word's row set to
 E and solve again. Prints one line per round. Runs on the node."""
 import os, sys, subprocess, re, time, itertools

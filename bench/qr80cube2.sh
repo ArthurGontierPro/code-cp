@@ -1,4 +1,6 @@
 #!/bin/bash
+# Lancé le 17/11 avec la version de minweight.mzn d'alors, où FIRST/SECOND/THIRD étaient facultatifs.
+# Pour le relancer, ajouter FIRST=0;SECOND=0;THIRD=0; aux paramètres manquants.
 # qr80cube2.sh -- second level for the QR80 cases FIRST = 1..19 (baguette did not finish them):
 # split each by the second chosen row (or "alone"). 120 baguette jobs at a time.
 cd /scratch/arthur/codes-cp; C=models/minweight.mzn

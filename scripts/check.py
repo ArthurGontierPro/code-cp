@@ -1,4 +1,6 @@
-"""Read a solution for code.mzn / golay.mzn (A as a flat n*n bool array) and report the
+"""HISTORIQUE (16/11) : première journée, ancien dossier /scratch/arthur/golay du nœud, modèle code.mzn ou golay.mzn. Gardé pour reproduire STATUS.md (16/11).
+
+Read a solution for code.mzn / golay.mzn (A as a flat n*n bool array) and report the
 weight distribution of the code spanned by [I_n | A] (all 2^n codewords, numpy)."""
 import re, sys, collections
 import numpy as np

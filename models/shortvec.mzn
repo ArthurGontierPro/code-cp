@@ -16,6 +16,10 @@
 %
 %  Aucune brisure de symétrie : la preuve d'UNSAT est donc entièrement certifiable, sans
 %  hypothèse admise. (w et -w sont tous deux cherchés ; c'est un facteur 2 au plus.)
+%  Les seuls axiomes sont la construction elle-même et les bornes W, Y, z ci-dessous. Ils sont
+%  testés par énumération (RESULTS.md, section E, ligne E5) : à la norme 4, Leech donne
+%  exactement 196560 vecteurs, 98256 avec b = 0 et 98304 avec b = 1, ce qui correspond aux
+%  formes connues (±4,±4,0^22), (±2^8,0^16) et (∓3,±1^23). Pour le cours : RESULTS.md §5.
 % =========================================================================================
 
 int: N;  int: k;  int: p;  int: Q;  int: D;
@@ -31,6 +35,8 @@ int: HALF;                                % au plus HALF coordonnées u_j non nu
 %            HALF = 6 borne la moitié choisie. Deux UNSAT couvrent tout le cas b = 0.
 %    b = 1 : toutes les w_i sont impaires, donc w·w ≤ 48 force w_i = ±1 ; un seul run, HALF = k.
 
+% Bornes des domaines. Elles sont écrites dans le .opb comme des axiomes : une borne trop
+% serrée enlèverait des solutions sans que VeriPB puisse le voir. D'où la justification :
 int: W = floor(sqrt(int2float(M * D)));   % |w_i| ≤ W puisque w_i² ≤ w·w ≤ M·D
 int: tmax = max([abs(t) | t in T]);
 int: Y = (W + tmax) div 2 + 1;           % |y_i| ≤ Y

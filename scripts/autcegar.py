@@ -12,7 +12,11 @@ true code, so an UNSAT here is as valid as the model's.
 
 Environment: TL = time limit per round in s (default 3600), MINDIST = path of the mindist
 binary (default: next to this script, compiled from mindist.c if missing),
-MZN = minizinc binary. PIDs of this script and of each solver run go to OUT.pid.
+MZN = minizinc binary. MODEL = the model (default models/aut.mzn; models/heur/aut_max.mzn
+branches on the generator bits, 1 first, which is much faster, see RESULTS.md B-heur).
+RESUME = 1: start from the light sets in OUT.dzn. IMG = 1: also add, for each light set, its
+images under the transpositions of E rows (see images()); a pure heuristic, every set is sound.
+PIDs of this script and of each solver run go to OUT.pid.
 """
 import os, sys, subprocess, re, time
 

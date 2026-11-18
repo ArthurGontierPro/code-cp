@@ -1,4 +1,6 @@
-"""lincheck.py k n < solver output -> minimum distance and T (number of words of that
+"""HISTORIQUE (16/11) : première journée, ancien dossier /scratch/arthur/golay du nœud, modèle code.mzn ou golay.mzn. Gardé pour reproduire STATUS.md (16/11).
+
+lincheck.py k n < solver output -> minimum distance and T (number of words of that
 weight) of the code [I_k | A], by enumerating the 2^k words (k <= 20)."""
 import re, sys, collections
 k, n = int(sys.argv[1]), int(sys.argv[2]); m = n - k

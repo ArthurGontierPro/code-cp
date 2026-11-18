@@ -1,4 +1,6 @@
-"""subsets.py N K > s.dzn -- the combinations of 1..K rows (out of N), each built from
+"""HISTORIQUE (16/11) : première journée, ancien dossier /scratch/arthur/golay du nœud, modèle code.mzn ou golay.mzn. Gardé pour reproduire STATUS.md (16/11).
+
+subsets.py N K > s.dzn -- the combinations of 1..K rows (out of N), each built from
 its parent (itself minus its highest row) and one row, so code.mzn can share the xors.
 Listed by size, so a parent always comes first."""
 import sys, itertools

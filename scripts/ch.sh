@@ -1,4 +1,5 @@
 #!/bin/bash
+# HISTORIQUE (16/11) : première journée, ancien dossier /scratch/arthur/golay du nœud, modèle code.mzn ou golay.mzn. Gardé pour reproduire STATUS.md (16/11).
 # ch.sh SECONDS "LABEL|DZN|FLAGS" ... -- Chuffed on code.mzn, one variant per arg, in
 # parallel, on the node. Output in /scratch/arthur/golay/ch2/LABEL.out
 M=/scratch/arthur/mzn/MiniZincIDE-2.10.1-x86_64-linux-gnu/bin/minizinc

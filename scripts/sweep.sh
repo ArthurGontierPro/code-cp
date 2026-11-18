@@ -1,4 +1,5 @@
 #!/bin/bash
+# HISTORIQUE (16/11) : première journée, ancien dossier /scratch/arthur/golay du nœud, modèle code.mzn ou golay.mzn. Gardé pour reproduire STATUS.md (16/11).
 # sweep.sh TAG SECONDS "K=..;LEX=..;COLS=..;" ... -- Chuffed on each variant in parallel, on the node
 M=/scratch/arthur/mzn/MiniZincIDE-2.10.1-x86_64-linux-gnu/bin/minizinc
 cd /scratch/arthur/golay; T=$1; L=$2; shift 2; mkdir -p ch/$T
