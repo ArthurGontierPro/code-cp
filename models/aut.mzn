@@ -243,11 +243,12 @@ constraint forall(S in FS)(
 % Combinaisons de générateurs binaires (indices de lignes de G) ajoutées par autcegar.py :
 % même contrainte de poids. Mettre "nE=0;E=[];" sinon.
 % (parité linéaire plutôt que l'arbre xr : avec des milliers d'ensembles E de taille ~25,
-%  l'arbre fait planter l'aplatissement de MiniZinc 2.10.1, segfault mesuré le 2026-11-18)
-function var bool: xlin(array[int] of var bool: v) =
-  let { var bool: b; var 0..length(v) div 2: z;
-        constraint sum(x in v)(bool2int(x)) = 2 * z + bool2int(b) } in b;
-constraint forall(e in 1..nE)(sum(q in 1..n)(bool2int(xlin([G[g,q] | g in E[e]]))) >= d);
+%  l'arbre fait planter l'aplatissement de MiniZinc 2.10.1, segfault mesuré le 2026-11-18 ; une
+%  fonction avec un let-contrainte le faisait planter aussi, d'où l'écriture en ligne)
+constraint forall(e in 1..nE)(
+  let { array[1..n] of var bool: b; array[1..n] of var 0..card(E[e]) div 2: z } in
+  forall(q in 1..n)(sum(g in E[e])(bool2int(G[g,q])) = 2 * z[q] + bool2int(b[q])) /\
+  sum(q in 1..n)(bool2int(b[q])) >= d);
 
 % ---- H4 : lignes de C0 strictement décroissantes ----
 constraint if LEX then forall(r in 1..h-1)(lex_greater(row(A0, r), row(A0, r+1))) else true endif;
