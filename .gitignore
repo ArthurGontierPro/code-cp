@@ -10,3 +10,4 @@ instances/
 results/runs/
 papers/
 mindist
+fzn/*.fzn
