@@ -1,6 +1,28 @@
-# Où on en est (2026-11-16)
+# Journal d'étape
 
-## Ce qu'on sait faire
+Un court résumé par journée, le plus récent en haut. Le détail est dans `RESULTS.md` (le tableau) et
+`ROADMAP.md` (la suite).
+
+## 18/11
+
+- Tests d'équivalence par énumération (RESULTS.md, section E) : Golay, QR48 et Leech donnent exactement
+  les nombres connus, découpages compris. Le modèle d'automorphismes retrouve QR48 pour l'ordre 23.
+- Les symétries des codes QR (trois coordonnées imposées) rendent QR80 vingt fois plus rapide et
+  QR104 faisable, sans preuve pour l'instant.
+- L'heuristique « 1 d'abord » résout l'ordre 7, k = 2 en 150 nœuds, avec une preuve baguette de 1 Mo.
+  Les boucles de longueur 72 font maintenant des tours de quelques minutes.
+- Demandes à baguette : coût par nœud, heuristiques, oubli de clauses, redémarrages, cubes, parité,
+  `bool_xor` avec une constante.
+
+## 17/11
+
+- Distance de QR80 certifiée par 2154 preuves baguette. Leech, Golay, QR48 et QR72 certifiés. P48p et
+  P48q extrémaux d'après Chuffed. Tutoriel de RESULTS.md écrit.
+- Bug de MiniZinc 2.10.1 (segfault à l'aplatissement) contourné dans `aut.mzn`.
+
+## 16/11 (première journée, les codes eux-mêmes)
+
+### Ce qu'on sait faire
 
 | Problème | Résultat | Avec quoi |
 |---|---|---|
@@ -14,20 +36,20 @@ Outils : models/code.mzn (auto-dual, commenté en français), models/linear.mzn 
 scripts/mindist.c (distance exacte), scripts/cegar.py (distance paresseuse),
 bench/ (runner du benchmark sur le nœud).
 
-## Ce qu'on ne sait pas faire
+### Ce qu'on ne sait pas faire
 
 - q48 sans la forme BDC : aucune méthode n'aboutit (Chuffed, recherche libre, paresseuse).
 - 72 avec d=16 sous BDC : on attend UNSAT (résultat connu), on ne l'obtient pas.
 - 96 : rien. Les codes extrémaux à 72 et 96 sont des problèmes ouverts.
 - Certifier la brisure de symétrie (journaliser le double-lex dans VeriPB).
 
-## En cours
+### En cours
 
 - Bug baguette : sur le benchmark, 36 preuves illisibles. Cause : baguette ne s'arrête
   pas à sa --time-limit sur les longs runs et mon timeout extérieur le tue en pleine
   écriture. Mesure lancée sur le nœud (limites 600/1200/2400/3600 s, dbg/).
 
-## Ce qu'on veut faire ensuite (par ordre)
+### Ce qu'on veut faire ensuite (par ordre)
 
 1. Corriger le bug de --time-limit (dans baguette, via le protocole multi-sessions).
 2. Non-existence certifiée de petits codes connus : (40,8,17), (35,10,13).

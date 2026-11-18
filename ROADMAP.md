@@ -1,34 +1,45 @@
-# Roadmap
+# Feuille de route
 
-Goal: dense sphere packings in dimensions 24k, i.e. extremal even unimodular lattices
-(24: Leech; 48: several known; 72: one known, Nebe; 96: open). The code experiments
-of 2026-11-16 (Golay, q48, [72,36,*], AAAI-26 benchmark, see STATUS.md) were the
-warm-up. Solvers: GCS with proof logging for scale; Chuffed for quick probing; Kissat
-when the problem is pure SAT; baguette kept in every comparison because its failures
-have found real bugs (see R0).
+Le but est d'utiliser des solveurs de contraintes avec journal de preuve sur les empilements denses de
+sphères en dimension 24k, c'est-à-dire les réseaux pairs unimodulaires extrémaux. En dimension 24 il
+n'y en a qu'un (Leech), en 48 on en connaît quatre, en 72 un seul (Nebe), et en 96 on n'en connaît
+aucun. Le détail des résultats est dans `RESULTS.md`. Ce fichier dit seulement ce qui est fait, ce qui
+tourne et ce qui vient ensuite.
 
-## R0. Housekeeping
-- R0.1 baguette `--time-limit` overshoot: on 1 h runs baguette never reached its own
-  limit check, the outer timeout cut 36 proofs mid-write. Measurement running in
-  `/scratch/arthur/codes-cp/dbg` (limits 600/1200/2400/3600 s). Report to the baguette
-  sessions (WORKLOG cross-session request) with the numbers.
-- R0.2 Move the node layout from `/scratch/arthur/golay` to `/scratch/arthur/codes-cp`
-  in the scripts.
+## Fait
 
-## R1. Literature: extremal lattices in dimensions 48, 72, 96
-What is known, what is open, which computations were done and how (enumeration,
-automorphism-based constructions, codes over rings), and where a certified constraint
-approach could add something. Output: a section in notes/ with references.
+- **R0. Le bug de `--time-limit` de baguette.** Mesuré, il dépasse sa limite d'environ 8 %, et ses
+  preuves sont complètes. Signalé dans le WORKLOG de baguette, devenu la tâche M6-T21. Les scripts
+  ont quitté l'ancien dossier `/scratch/arthur/golay`, sauf ceux de la première journée.
+- **R1. La littérature** sur les réseaux extrémaux en dimension 48, 72 et 96 :
+  `notes/lattices-literature.md`.
+- **R3. Des codes aux réseaux.** Leech est construit à partir de Golay (construction B plus un
+  translaté), et son minimum 4 est certifié. La distance de Golay, QR48, QR72 et QR80 est certifiée,
+  celle de QR104 est établie sans preuve. P48p et P48q sont extrémaux d'après Chuffed, sans preuve.
+- **Les tests du modèle** (RESULTS.md, section E). Les découpages et les constructions donnent
+  exactement les nombres connus sur Golay, QR48 et Leech.
 
-## R2. Leech lattice from scratch (dimension 24)
-Gram-matrix model (notes, Model B): basis of minimal vectors, diagonal 4,
-off-diagonal in {-2..2}. Short vectors forbidden LAZILY: for a fixed integer x,
-x^T G x is linear in G, so "no vector of norm 2" is one linear cut per x found by
-Fincke-Pohst, exactly the cegar.py loop with mindist.c replaced. Open part: positive
-definiteness and det G = 1 (nonlinear). First with Chuffed/GCS outside the solver,
-then as a GCS propagator whose justification is the vector x.
+## Mis de côté
 
-## R3. From codes to lattices
-Build Leech from the Golay code by an explicit construction (Construction A gives
-norm-2 vectors, a twisted construction is needed), then use the codes we can find
-(q48, [72,36,12] BDC) as starting points for dimension 48 and 72 constructions.
+- **R2. Leech à partir de rien** (matrice de Gram en inconnue). La contrainte det G = 1 ne s'écrit pas
+  simplement en CP, et tout le domaine passe par les codes. Voir RESULTS.md, bloc D.
+
+## En cours sur le nœud
+
+- La certification de P48 par baguette (`bench/p48bag.sh`) et ses tests d'équivalence (52 millions de
+  vecteurs).
+- La preuve baguette de QR104 et de QR80 avec les symétries du code (`bench/fix.sh`, `c104rbag.sh`).
+- Le modèle d'automorphismes. Ordre 7 en longueur 72 (reproduire Feulner–Nebe), ordres 5 et 3 (la
+  question ouverte), et les tests en longueur 48 où la réponse est connue.
+
+## Ensuite
+
+- **R4. Le [72, 36, 16] par ses automorphismes.** Finir l'ordre 7 (k = 3, 4, 5), puis l'ordre 5. Faire
+  converger la boucle paresseuse plus vite, par exemple en ajoutant les images des mots légers par les
+  symétries du modèle (option `IMG` de `autcegar.py`, en test).
+- **R5. La chaîne de confiance.** Pour l'instant on teste la faisabilité et on comprend ce qu'on fait.
+  Si un résultat en vaut la peine, on le refera avec la chaîne complète, c'est-à-dire des découpages et
+  des symétries justifiés dans la preuve, puis la vérification par CakePB.
+- **R6. Ce qu'on attend de baguette** (demandes dans son WORKLOG) : le coût par nœud sur les modèles
+  pleins de XOR, une étude d'heuristiques, l'oubli de clauses par LBD, les redémarrages, les cubes
+  sous hypothèses, la parité, et la correction du `bool_xor` avec une constante.
