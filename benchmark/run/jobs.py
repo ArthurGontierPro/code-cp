@@ -25,7 +25,7 @@ for line in open(f"{D}/MANIFEST.tsv"):
             J += [("cnf", ".", "yalsat", f(".cnf"), ".")]
         J += [("xnf", ".", "cryptominisat", f(".xnf"), ".")]
         J += [("opb", ".", s, f(".opb"), ".") for s in ("roundingsat", "exact")]
-        J += [("lp", ".", s, f(".lp"), ".") for s in ("highs", "scip")]
+        J += [("lp", ".", s, f(".lp"), ".") for s in ("highs", "scip", "gurobi")]
         J += [("asp", ".", "clingo", f(".asp"), ".")]
         J += [("smt2", ".", s, f(".smt2"), ".") for s in ("z3", "cvc5")]
         J += [(f"enc{e}", ".", s, f(".dzn"), str(e)) for s in MZN for e in (1, 2)]
@@ -33,7 +33,7 @@ for line in open(f"{D}/MANIFEST.tsv"):
     elif fam == "P1" and kind == "opt":
         J += [("opb", ".", s, f("_opt.opb"), ".") for s in ("roundingsat", "exact")]
         J += [("wcnf", ".", s, f(".wcnf"), ".") for s in ("uwrmaxsat", "evalmaxsat")]
-        J += [("lp", ".", s, f("_opt.lp"), ".") for s in ("highs", "scip")]
+        J += [("lp", ".", s, f("_opt.lp"), ".") for s in ("highs", "scip", "gurobi")]
         J += [("asp", ".", "clingo", f("_opt.asp"), ".")]
         J += [("trellis", ".", "trellis-dp", f(".json"), "opt")]
     elif fam == "P3":

@@ -72,7 +72,7 @@ et les 91 runs donnent la réponse attendue (`run/smoke-result.txt`).
 | comptage | ganak 2.9.0, gpmc 1.2.0 (comptage projeté) | .cnf avec `c p show` | aucune |
 | CP avec apprentissage | chuffed, cpsat (OR-Tools 9.15), pumpkin, huub, baguette b403e28 | .dzn (MiniZinc) | DRCP pour pumpkin (son propre format), VeriPB pour baguette |
 | CP sans apprentissage | gecode, gcs | .dzn | VeriPB pour gcs |
-| MILP | highs (1.16 seul, 1.15 par MiniZinc), scip 10.0 | .lp, .dzn | aucune ici (SCIP exact donnerait VIPR) |
+| MILP | highs (1.16 seul, 1.15 par MiniZinc), scip 10.0, gurobi 13.0.3 | .lp, .dzn | aucune ici (SCIP exact donnerait VIPR) |
 | ASP | clingo 5.8.3 | .asp | aucune |
 | SMT | z3, cvc5 1.4.2 | .smt2 | cvc5 peut en produire (non activé) |
 | programmation dynamique | trellis-dp (le nôtre, Python) | .json | le calcul lui-même |
@@ -83,4 +83,7 @@ et les 91 runs donnent la réponse attendue (`run/smoke-result.txt`).
   qui contient dd (BDD avec CUDD), dwave-neal (recuit pour le QUBO) et fpylll (réseaux).
 - Les solveurs MiniZinc prennent `INPUT.dzn TL [ENC]`. `ENC` vaut 1 (XOR) ou 2 (sommes) pour
   `minweight_chk.mzn`, et `-` pour un modèle sans ENC (`MODEL=.../linear.mzn` pour P3).
+- Gurobi tourne avec une licence académique liée à la machine. Le fichier est
+  `/scratch/arthur/tools/bench/gurobi/lic-<hostname>/gurobi.lic` (obtenu avec `grbgetkey --path`, jamais commité),
+  valable jusqu'au 19/11/2027 sur fataepyc-07.
 - Bitwuzla (pas d'arithmétique entière) et msolve (FLINT manquant) ne sont pas installés.
