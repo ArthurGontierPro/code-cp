@@ -12,11 +12,12 @@ ones on S or off S).
   - minimum distance (expected_opt): t grows until the lightest word found has weight <= 2t + 1.
 Prints one line per file: "ok", or "MISMATCH" (exit status 1), or "filled" when the file had no
 expected answer (a random code) and --fill was given, in which case the answer is written back.
-Needs benchmark/verify/mindist2 (built from mindist2.c with gcc -O3 -fopenmp)."""
+Needs mindist2, compiled on /scratch: gcc -O3 -march=native -fopenmp -o /scratch/arthur/codes-cp-work/bin/mindist2
+benchmark/verify/mindist2.c (MINDIST2 env overrides the path)."""
 import sys, os, json, random, subprocess
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-BIN = os.path.join(HERE, "mindist2")
+BIN = os.environ.get("MINDIST2", "/scratch/arthur/codes-cp-work/bin/mindist2")   # compiled on /scratch
 
 
 def rref(rows, order):

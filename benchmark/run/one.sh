@@ -1,6 +1,6 @@
 #!/bin/bash
-# one.sh OUTDIR TL "JOBLINE" -- one job of campaign.sh. Writes OUTDIR/<id>.log (the solver's output,
-# last 200 kB) and OUTDIR/<id>.res, one line:
+# one.sh OUTDIR TL "JOBLINE" -- one job of campaign.sh. Writes $LOGDIR/<id>.log (the solver's output,
+# last 200 kB, on /scratch; OUTDIR when LOGDIR is unset) and OUTDIR/<id>.res, one line:
 #   id solver expected value status got_value time maxrss_kb
 # status is the wrapper's RESULT, or MEMOUT when it did not answer and its peak RSS reached 31 GB.
 OUT=$1; TL=$2
@@ -9,7 +9,7 @@ IFS=$'\t' read -r id exp val env solver input extra <<< "$3"
 while [ "$(awk '/MemAvailable/ {print int($2 / 1048576)}' /proc/meminfo)" -lt 96 ]; do sleep 30; done
 ENV=(); [ "$env" != . ] && ENV=("$env")
 EX=(); [ "$extra" != . ] && EX=("$extra")
-log=$OUT/$id.log
+log=${LOGDIR:-$OUT}/$id.log
 env "${ENV[@]}" systemd-run --user --scope --quiet --collect --unit="b1-$id" \
   -p MemoryMax=32G -p MemorySwapMax=0 \
   /usr/bin/time -f 'maxrss_kb %M' bash "solvers/$solver/run.sh" "$input" "$TL" "${EX[@]}" > "$log" 2>&1

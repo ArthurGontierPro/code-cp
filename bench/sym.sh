@@ -4,7 +4,7 @@
 # Golay (weight ≤ 4) and QR48 (weight ≤ 8), all UNSAT. Chuffed, GCS without proof, baguette with
 # proof. Then the merged dominance proof on QR48 (dom/run.sh). See dom/README.md.
 # Run on the node from the repo root: nohup setsid bash bench/sym.sh &  (PIDs in results/sym.pid)
-cd /scratch/arthur/codes-cp; export TL=${TL:-3600}
+cd /cluster/arthur/codes-cp; export TL=${TL:-3600}
 P0="HALF=99;FIRST=0;SECOND=0;THIRD=0;"
 for S in chuffed gcs bag; do
   for c in "golay24 sym_p23_w4 4 12" "qr48 sym_p47_w8 8 24"; do

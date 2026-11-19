@@ -7,7 +7,7 @@
 #  2. Chuffed to completion (48 h cap) on the orbit, ENC=2, without symmetry;
 #  3. baguette without PB conflict analysis, stopped by its own time limit so it prints its counters.
 # Run on the node: nohup setsid bash bench/x2.sh &   (session id in results/x2.pid)
-cd /scratch/arthur/codes-cp; export TL=${TL:-3600}
+cd /cluster/arthur/codes-cp; export TL=${TL:-3600}
 for f in sym_p47_w8 sym_p47_w8_nofix sym_p23_w4 sym_p23_w4_nofix; do
   [ -f dom/${f}_basis.dzn ] || python3 scripts/basisdzn.py dom/$f.dzn dom/${f}_basis.dzn
 done

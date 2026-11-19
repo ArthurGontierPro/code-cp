@@ -1,9 +1,9 @@
 # Benchmark multi-paradigmes (piste 9, `notes/benchmark-plan.md`)
 
 Des problèmes de codes et de réseaux, chacun sous plusieurs écritures, avec la réponse connue, pour
-comparer le meilleur solveur de chaque paradigme. Ce dossier contient l'outillage. Les gros fichiers
-d'instances et les résultats restent sur le nœud (`/scratch/arthur/codes-cp/benchmark/`), seules
-les instances de test (`smoke/`) sont suivies par git.
+comparer le meilleur solveur de chaque paradigme. Ce dossier contient l'outillage. Les instances
+générées et les logs des solveurs vont sur `/scratch/arthur/codes-cp-work/benchmark/`, les `.res` dans
+`benchmark/results/` du dépôt sur `/cluster`. Seules les instances de test (`smoke/`) sont suivies par git.
 
 ## Organisation
 
@@ -84,24 +84,27 @@ et les 91 runs donnent la réponse attendue (`run/smoke-result.txt`).
 - Les solveurs MiniZinc prennent `INPUT.dzn TL [ENC]`. `ENC` vaut 1 (XOR) ou 2 (sommes) pour
   `minweight_chk.mzn`, et `-` pour un modèle sans ENC (`MODEL=.../linear.mzn` pour P3).
 - Gurobi tourne avec une licence académique liée à la machine. Le fichier est
-  `/scratch/arthur/tools/bench/gurobi/lic-<hostname>/gurobi.lic` (obtenu avec `grbgetkey --path`, jamais commité),
+  `/cluster/arthur/licences/gurobi/lic-<hostname>/gurobi.lic` (obtenu avec `grbgetkey --path`, jamais commité),
   valable jusqu'au 19/11/2027 sur fataepyc-07.
 - Bitwuzla (pas d'arithmétique entière) et msolve (FLINT manquant) ne sont pas installés.
 
 ## Lancer et lire une campagne
 
-Tout se fait sur le nœud, depuis `benchmark/`, avec `PY=/scratch/arthur/tools/venv/bin/python`.
+Tout se fait sur le nœud, depuis `benchmark/` dans le dépôt sur `/cluster`, avec
+`PY=/scratch/arthur/tools/venv/bin/python` et `W=/scratch/arthur/codes-cp-work`.
 
-1. `$PY gen/phase1.py instances/phase1` construit les 115 instances de la phase 1 et leur
+1. `$PY gen/phase1.py $W/benchmark/instances/phase1` construit les 115 instances de la phase 1 et leur
    `MANIFEST.tsv`. Chaque réponse P1 est d'abord recalculée à partir des seules matrices de parité
    par `verify/verify_p1.py` (énumération sur deux ensembles d'information, `verify/mindist2.c`,
-   compilé avec `gcc -O3 -fopenmp -o verify/mindist2 verify/mindist2.c`). Un désaccord arrête tout.
-2. `$PY run/jobs.py instances/phase1 > instances/phase1-jobs.tsv` écrit un run par ligne
+   compilé sur `/scratch` avec
+   `gcc -O3 -march=native -fopenmp -o $W/bin/mindist2 verify/mindist2.c`). Un désaccord arrête tout.
+2. `$PY run/jobs.py $W/benchmark/instances/phase1 > $W/benchmark/phase1-jobs.tsv` écrit un run par ligne
    (instance, écriture, solveur).
-3. `setsid nohup bash run/campaign.sh instances/phase1-jobs.tsv results/phase1-p1 600 92 &` lance
+3. `setsid nohup bash run/campaign.sh $W/benchmark/phase1-jobs.tsv results/phase1-p1 600 92 &` lance
    92 runs à la fois, chacun dans son scope systemd avec `MemoryMax=32G`. Un run déjà fait (son `.res`
    existe) est sauté, donc relancer la même commande après avoir ajouté un solveur ne lance que ses
-   runs. Le PID du lanceur est dans `results/phase1-p1/pid`, et `results/phase1-p1/done` apparaît à
+   runs. Les `.res` restent dans `results/phase1-p1` sur `/cluster`, les logs des solveurs vont dans
+   `$W/benchmark/logs/phase1-p1`. Le PID du lanceur est dans `results/phase1-p1/pid`, et `results/phase1-p1/done` apparaît à
    la fin. L'arrêt se fait par ce PID, puis par les scopes `b1-*` (voir l'en-tête de `campaign.sh`).
 4. `$PY run/score.py results/phase1-p1 600` donne, par solveur et par écriture, les runs, les
    instances résolues, les réponses fausses et le PAR-2. `run/best.py` donne le meilleur solveur par

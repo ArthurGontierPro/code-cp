@@ -1,6 +1,6 @@
 #!/bin/bash
 # p48split.sh -- B5 by cases (see models/shortvec.mzn header): b=0 left/right halves, b=1.
-cd /scratch/arthur/codes-cp
+cd /cluster/arthur/codes-cp
 TL1=${TL1:-3600}; TL2=${TL2:-7200}
 job() { lab=$1; TL=$TL1 bench/run1.sh chuffed $2 $3 "$4" ${lab}_chuffed & a=$!
   TL=$TL1 bench/run1.sh gcs $2 $3 "$4" ${lab}_gcs & c=$!; wait $a $c

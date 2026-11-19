@@ -1,7 +1,7 @@
 #!/bin/bash
 # aut3.sh -- the length-72 lazy loops again, in parallel with aut2.sh, with the "1 first" heuristic
 # (models/heur/aut_max.mzn), resuming from aut2's light sets. 1 h rounds.
-cd /scratch/arthur/codes-cp; PF=results/aut/aut3.pid
+cd /cluster/arthur/codes-cp; PF=results/aut/aut3.pid
 while read lab d; do
   cp results/aut/${lab}_chuffed.dzn results/aut/${lab}_max.dzn
   RESUME=1 MODEL=models/heur/aut_max.mzn TL=3600 setsid nohup timeout 604800 python3 scripts/autcegar.py \

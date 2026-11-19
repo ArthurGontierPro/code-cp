@@ -5,7 +5,7 @@
 # instance, only if a no-proof solver concluded within TL1/2: GCS with proof and baguette
 # (always proof), both checked by veripb (TL2). Everything in parallel; one line per run in
 # results/runs/*.res. Launched detached; PIDs in results/runs/blockb.pid.
-cd /scratch/arthur/codes-cp
+cd /cluster/arthur/codes-cp
 TL1=${TL1:-3600}; TL2=${TL2:-7200}
 job() { # label model inst params
   lab=$1; TL=$TL1 bench/run1.sh chuffed $2 $3 "$4" ${lab}_chuffed & a=$!

@@ -3,8 +3,8 @@
 ## La machine
 
 Les expériences de codes-cp tournent sur fataepyc-07 (192 cœurs, 2 To de mémoire, Ubuntu 26.04). Le
-dépôt y est cloné dans `/scratch/arthur/codes-cp`, qui suit `origin/main` par `git pull`. `/scratch` est
-local au nœud. Le dossier personnel `/users/grad/arthur` est partagé par NFS entre les nœuds.
+dépôt y est cloné dans `/cluster/arthur/codes-cp`, qui suit `origin/main` par `git pull` (voir plus bas
+pourquoi `/cluster` et pas `/scratch`). `/scratch` est local au nœud. Le dossier personnel `/users/grad/arthur` est partagé par NFS entre les nœuds.
 
 La machine est partagée avec d'autres expériences du même utilisateur, souvent pour des jours.
 - Les re-vérifications VeriPB de `ladbug` (`/scratch/arthur/ladbug-loop3.sh` et ses `veripb p.opb
@@ -30,7 +30,7 @@ Avant de lancer une campagne, regarder `uptime` et `ps -u arthur`. Au plus 92 ru
 | Gurobi 13.0.3 | `/scratch/arthur/tools/bench/gurobi/gurobi1303` |
 
 Gurobi tourne avec une licence académique liée à la machine, rangée dans
-`/scratch/arthur/tools/bench/gurobi/lic-<hostname>/gurobi.lic` et valable jusqu'au 19/11/2027 sur
+`/cluster/arthur/licences/gurobi/lic-<hostname>/gurobi.lic` (mode 700) et valable jusqu'au 19/11/2027 sur
 fataepyc-07. Pour un autre nœud, il faut une autre licence, obtenue avec `grbgetkey --path` sur ce
 nœud depuis le réseau de l'université. Le fichier ne va jamais dans le dépôt.
 
@@ -38,23 +38,34 @@ Pour aplatir un modèle pour baguette, on passe sa bibliothèque à MiniZinc ave
 `-c --solver /scratch/arthur/baguette-b403e28/tools/baguette.msc`, puis on lance `main.exe` sur le
 `.fzn` (voir `benchmark/solvers/baguette/run.sh`).
 
-## /scratch et /cluster
+## /cluster pour vivre, /scratch pour calculer
 
-`/scratch` (13 To, local, rapide) est l'endroit où l'on travaille, mais il peut être effacé par une
-réinstallation ou une panne. `/cluster` (NFS, partagé par le groupe, permanent, plus lent) garde une
-copie de ce que git ne contient pas. `bash scripts/save.sh` copie dans `/cluster/arthur/codes-cp-save`
-les sorties des runs sans les preuves brutes `.pbp` (régénérables, plus de 50 Go), `dom/` sans ses
-`.pbp`, les instances et les résultats du benchmark, les PDF, les fichiers `VERSION` des solveurs et
-les licences Gurobi. Le dossier est en mode 700, parce que `/cluster/arthur` est ouvert en écriture à
-tous. On le lance en fin de session, rsync ne recopie que ce qui a changé.
+`/cluster` (NFS, partagé par le groupe, permanent, plus lent) porte le dépôt,
+`/cluster/arthur/codes-cp`. On y lit, on y écrit le code et les notes, et les résultats légers y
+restent (les lignes `.res`, les modèles gzippés des runs, les tableaux).
 
-Ce qui n'est pas sauvé se reconstruit : le code depuis GitHub, les solveurs avec leurs
-`benchmark/solvers/*/install.sh` (environ 4 Go dans `/scratch/arthur/tools`), baguette b403e28 depuis
-son dépôt GitHub, les preuves en relançant les runs.
+`/scratch` (13 To, local au nœud, rapide) peut être effacé par une réinstallation ou une panne. On y
+compile et on y lance. Tout ce qui est lourd ou se régénère y va, sous `/scratch/arthur/codes-cp-work`
+(variable `WORK`) :
+- `runs/` : les FlatZinc, les `.opb` et les preuves des runs de `bench/run1.sh` et `bench/rs1.sh`.
+  Le `.pbp` est supprimé après vérification, sauf si `KEEP` est posé, et il reste alors sur `/scratch`.
+- `benchmark/instances/`, `benchmark/logs/` : les instances générées et les sorties des solveurs du
+  benchmark. Les `.res` vont dans `benchmark/results/` sur `/cluster`.
+- `bin/` : les binaires compilés du dépôt (`mindist2`).
+- `dom/` : les preuves fusionnées de la chaîne de dominance (les `.dzn` et `.json` restent dans `dom/`).
 
-## Où vont les sorties
+Aucune preuve n'est gardée sur `/cluster`, sauf les petites preuves de test suivies par git
+(`notes/dominance/`, `benchmark/smoke/`). Les solveurs sont compilés dans `/scratch/arthur/tools` et se
+réinstallent avec leurs `benchmark/solvers/*/install.sh`. La licence Gurobi est sur `/cluster` parce
+qu'elle ne se régénère pas sans `grbgetkey`.
 
-- `results/runs/` : les runs des scripts `bench/` (ignoré par git, 63 Go le 19/11).
-- `benchmark/instances/`, `benchmark/results/` : les instances générées et les campagnes (ignorés).
-- `dom/` : les preuves fusionnées et leurs `.dzn` (les `.opb`, `.pbp` et `.dzn` sont ignorés).
-- `results/` hors `runs/` : les résultats gardés dans git.
+L'ancien clone de travail, avec les preuves et les sorties jusqu'au 19/11, est
+`/scratch/arthur/codes-cp-old-2026-11-19`. Ses résultats légers ont été recopiés dans le dépôt sur
+`/cluster`, ses preuves n'ont pas été gardées.
+
+## Ce qui est ignoré par git mais gardé sur /cluster
+
+- `results/runs/` : les `.res`, `.log`, `.sol` et les modèles gzippés (`.fzn.gz`, `.opb.gz`) des runs.
+- `benchmark/results/` : les `.res` des campagnes.
+- `dom/` : les `.dzn` et `.json` des modèles symétriques.
+- `papers/` et les PDF, `external/` (le dépôt de l'article AAAI-26).

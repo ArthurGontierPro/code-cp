@@ -3,7 +3,7 @@
 # 1. counts (Chuffed -a) that must equal λ3 = A_d·C(d,3)/C(n,3), for several triples:
 #    Golay d=8: 759·56/2024 = 21.  QR48 d=12: 17296·220/17296 = 220.  QR80 d=16: equal for every triple.
 # 2. the UNSAT runs with halves + 3 fixed coordinates: QR80 weight ≤ 12, QR104 weight ≤ 16.
-cd /scratch/arthur/codes-cp; O=results/fix; mkdir -p $O
+cd /cluster/arthur/codes-cp; O=results/fix; mkdir -p $O
 MZN=/scratch/arthur/mzn/MiniZincIDE-2.10.1-x86_64-linux-gnu/bin/minizinc
 cnt() {  # name inst Wmax FIXU FIXC
   r=$(timeout 86400 $MZN --solver chuffed -a -D "Wmax=$3;HALF=100;FIRST=0;SECOND=0;THIRD=0;FIXU=$4;FIXC=$5;" \

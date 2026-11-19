@@ -2,7 +2,7 @@
 # x2sat.sh -- the 2x2 design of bench/x2.sh for SAT solvers: rows = basis or orbit, parity = native
 # XOR (CryptoMiniSat) or clauses; CryptoMiniSat with and without Gaussian elimination, Kissat on the
 # clauses. Same four instances (3, 2, 0 fixed coordinates at weight <= 8, and weight <= 4).
-cd /scratch/arthur/codes-cp; export TL=${TL:-3600}; mkdir -p dom/cnf; PY=/scratch/arthur/tools/venv/bin/python
+cd /cluster/arthur/codes-cp; export TL=${TL:-3600}; mkdir -p dom/cnf; PY=/scratch/arthur/tools/venv/bin/python
 {
 for c in "sym_p47_w8 q48_fix" "sym_p47_w8_f2 q48f2" "sym_p47_w8_nofix q48_nofix" "sym_p47_w4_nofix q48w4"; do set -- $c
   for r in "" _basis; do

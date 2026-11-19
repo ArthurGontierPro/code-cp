@@ -3,10 +3,11 @@
 # MODE=opt|dec (default: opt iff the file name contains "_opt."). The decision files have the zero
 # objective "0 x1", so in dec mode SolutionLimit=1 stops at the first feasible point.
 # Licence: an academic named-user licence is tied to one machine, so each node has its own file,
-# $D/lic-<hostname>/gurobi.lic (fetched with grbgetkey --path on that node, never committed).
+# /cluster/arthur/licences/gurobi/lic-<hostname>/gurobi.lic (fetched with grbgetkey --path on that
+# node, kept on /cluster because /scratch can be wiped, never committed).
 D=/scratch/arthur/tools/bench/gurobi; G=$D/gurobi1303/linux64
 export LD_LIBRARY_PATH=$G/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
-export GRB_LICENSE_FILE=$D/lic-$(hostname -s)/gurobi.lic
+export GRB_LICENSE_FILE=/cluster/arthur/licences/gurobi/lic-$(hostname -s)/gurobi.lic
 export TMPDIR=${BENCH_TMPDIR:-/scratch/arthur/tools/bench/tmp}; mkdir -p "$TMPDIR"
 INPUT=$(realpath "$1"); TL=${2:-60}; t0=$(date +%s.%N)
 MODE=${MODE:-$(case "$(basename "$INPUT")" in *_opt.*) echo opt;; *) echo dec;; esac)}

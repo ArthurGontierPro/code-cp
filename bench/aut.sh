@@ -2,7 +2,7 @@
 # aut.sh -- RESULTS.md B6 (order 7, expected UNSAT) and C1/C2 (orders 5 and 3, open).
 # Direct runs go through bench/run1.sh on models/aut.mzn (no data file: everything in -D);
 # lazy runs through scripts/autcegar.py (TL = per round). Detached; PIDs in results/aut/aut.pid.
-cd /scratch/arthur/codes-cp; mkdir -p results/aut
+cd /cluster/arthur/codes-cp; mkdir -p results/aut
 G=/scratch/arthur/gcs/build/glasgow.msc; A=models/aut.mzn
 direct() { TL=${2:-21600} bench/run1.sh $1 $A - "$3" $4; }
 cegar()  { TL=3600 timeout 86400 python3 scripts/autcegar.py results/aut/$1 "$2" $3 > results/aut/$1.log 2>&1; }

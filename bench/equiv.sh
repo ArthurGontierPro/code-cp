@@ -6,7 +6,7 @@
 #    without fixed points (3^16), order 23 as 23^2 1^2. So: p = 3 (3^16) and p = 23 must be SAT,
 #    and p = 5, 7, 11, or p = 3 with fixed points, must be UNSAT.
 # PIDs of the detached leaders go to results/equiv/equiv.pid.
-cd /scratch/arthur/codes-cp; mkdir -p results/equiv; PF=results/equiv/equiv.pid
+cd /cluster/arthur/codes-cp; mkdir -p results/equiv; PF=results/equiv/equiv.pid
 for t in qr48 leech p48p p48q; do
   setsid nohup timeout 345600 python3 scripts/equivcount.py $t 60 > results/equiv/$t.out 2>&1 < /dev/null &
   echo $! >> $PF

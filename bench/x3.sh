@@ -5,7 +5,7 @@
 #   def : default flags, the model's annotation (the search shared with Chuffed and GCS)
 #   f   : -f  (alternate between the annotation and activity, Luby restarts, phase saving)
 #   act : --search activity --restarts luby --phase-saving --reuse-trail, BAGUETTE_RETENTION=tiered
-cd /scratch/arthur/codes-cp; export TL=${TL:-3600} BAG=/scratch/arthur/baguette-b403e28
+cd /cluster/arthur/codes-cp; export TL=${TL:-3600} BAG=/scratch/arthur/baguette-b403e28
 {
 for c in "sym_p47_w8 q48_fix" "sym_p47_w8_f2 q48f2" "sym_p47_w8_nofix q48_nofix" "sym_p47_w4_nofix q48w4"; do set -- $c
   for r in "" _basis; do for e in 1 2; do

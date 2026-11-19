@@ -2,7 +2,7 @@
 # smoke.sh [TL] -- every solver of benchmark/solvers on the smoke instances of its format, against
 # smoke/EXPECTED. Prints one line per run (solver, file, expected, got) and a final count.
 # Runs on the node from benchmark/: bash run/smoke.sh 60
-cd "$(dirname "$0")/.."; TL=${1:-60}; S=smoke; MZ=/scratch/arthur/codes-cp/models
+cd "$(dirname "$0")/.."; TL=${1:-60}; S=smoke; MZ=/cluster/arthur/codes-cp/models
 ok=0; bad=0
 check() {   # check SOLVER EXPECTED FILE [ARGS...] (env vars before the call are passed through)
   local s=$1 exp=$2; shift 2

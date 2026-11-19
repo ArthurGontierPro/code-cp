@@ -3,7 +3,7 @@
 # Pour le relancer, ajouter FIRST=0;SECOND=0;THIRD=0; aux paramètres manquants.
 # qr80cube2.sh -- second level for the QR80 cases FIRST = 1..19 (baguette did not finish them):
 # split each by the second chosen row (or "alone"). 120 baguette jobs at a time.
-cd /scratch/arthur/codes-cp; C=models/minweight.mzn
+cd /cluster/arthur/codes-cp; C=models/minweight.mzn
 for side in L R; do f=instances/qr80.dzn; [ $side = R ] && f=instances/qr80_T.dzn
   for i in $(seq 1 19); do for j in -1 $(seq $((i+1)) 40); do
     echo "$f $i $j $side"; done; done; done |

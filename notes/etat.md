@@ -12,7 +12,7 @@ fois plus lent que b403e28.
 
 - Le benchmark, phase 1, première passe : 115 instances (P1 distance minimale, P3 existence de codes),
   27 configurations de solveurs, 2 687 runs de 10 min, sans preuve. Aucune réponse fausse. Les
-  résultats sont dans `benchmark/results/phase1-p1/` sur le nœud, lus avec `benchmark/run/score.py` et
+  résultats sont dans `benchmark/results/phase1-p1/` (sur `/cluster`), lus avec `benchmark/run/score.py` et
   `benchmark/run/best.py`. En bref :
   - P1 décision : CryptoMiniSat (60 sur 64) puis Kissat, CaDiCaL, RoundingSat et SCIP (57), Gurobi,
     HiGHS ; les solveurs CP entre 42 et 50 ; baguette 39 (sommes) et 36 (XOR).

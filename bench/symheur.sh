@@ -5,7 +5,7 @@
 # with the search restricted to the word x:
 #   def : no annotation      x : bool_search(x, input_order, indomain_min)
 #   x1  : indomain_max       free : Chuffed -f (activity-based, restarts)
-cd /scratch/arthur/codes-cp; mkdir -p models/heur
+cd /cluster/arthur/codes-cp; mkdir -p models/heur
 for v in min max; do
   sed "s/^solve satisfy;/solve :: bool_search(x, input_order, indomain_$v) satisfy;/" models/minweight_sym.mzn > models/heur/minweight_sym_$v.mzn
 done

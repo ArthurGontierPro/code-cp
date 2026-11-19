@@ -2,7 +2,7 @@
 # job.sh SOLVER n k d -- one benchmark job on the node; writes out/SOLVER_n_k_d.{res,log}
 # SOLVER: chuffed | gcs | baguette (with --proof + veripb) | kissat (their CNF, SAT noopt DX SB e6)
 S=$1; n=$2; k=$3; d=$4; TL=${TL:-3600}
-B=/scratch/arthur/codes-cp; O=$B/bench/out/${S}_${n}_${k}_${d}; mkdir -p $B/bench/out
+B=/cluster/arthur/codes-cp; O=$B/bench/out/${S}_${n}_${k}_${d}; mkdir -p $B/bench/out
 MZN=/scratch/arthur/mzn/MiniZincIDE-2.10.1-x86_64-linux-gnu/bin/minizinc
 BAG=/scratch/arthur/golay/baguette; TOOLS=/scratch/arthur/tools
 D="n=$n;k=$k;d=$d;SB=true;T=-1;"

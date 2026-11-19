@@ -6,7 +6,7 @@
 #  expected bad: the AAAI-26 benchmark (the generator matrix is the unknown), their CNF, CMS against
 #    Kissat on instances Kissat solved in 4 s to 15 min on 2026-11-16.
 # TL 3600 (good) and 1800 (AAAI).
-cd /scratch/arthur/codes-cp; mkdir -p dom/cnf; PY=/scratch/arthur/tools/venv/bin/python
+cd /cluster/arthur/codes-cp; mkdir -p dom/cnf; PY=/scratch/arthur/tools/venv/bin/python
 {
 for c in "qr72 8" "qr80 12" "qr104 16"; do set -- $c
   for f in 0 3; do

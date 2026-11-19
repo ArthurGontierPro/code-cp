@@ -3,7 +3,7 @@
 #   SOLVER: cms (CryptoMiniSat 5.18.0, Gaussian elimination on) | cmsng (same, --maxnummatrices 0:
 #   no Gauss) | kissat (4.0.2)
 S=$1; CNF=$2; LAB=$3; TL=${TL:-3600}
-B=/scratch/arthur/codes-cp; O=$B/results/runs/$LAB
+B=/cluster/arthur/codes-cp; O=$B/results/runs/$LAB
 CMS=/scratch/arthur/tools/cms/cryptominisat5; KIS=/scratch/arthur/tools/kissat/build/kissat
 ulimit -S -v ${MEM:-16000000}
 t0=$(date +%s.%N)

@@ -23,8 +23,11 @@ fichiers par sujet ci-dessous, à lire selon la tâche plutôt que d'un bloc.
 - Les règles de la machine (tuer par PID, parallélisme, mémoire) sont dans le `~/.claude/CLAUDE.md` du
   nœud. Propre à ce projet : les runs `ladbug` (`/scratch/arthur/ladbug-*`) ne sont pas à nous, et
   `benchmark/run/campaign.sh` applique déjà la limite de 92 runs à 32 Go chacun.
-- `/scratch` peut être effacé. En fin de session, `bash scripts/save.sh` copie sur `/cluster` ce que git
-  ne contient pas (voir `notes/noeud.md`).
+- On vit et on code sur `/cluster` (permanent), on compile et on lance sur `/scratch` (rapide, effaçable).
+  Le dépôt est `/cluster/arthur/codes-cp`. Les FlatZinc, les preuves, les logs des solveurs, les
+  instances générées et les binaires vont dans `/scratch/arthur/codes-cp-work` (variable `WORK`). Aucune
+  preuve n'est gardée sur `/cluster`, sauf les petites preuves de test suivies par git. Voir
+  `notes/noeud.md`.
 - On ne commite que des chemins explicites, jamais `git add -A`. Les messages de commit finissent par
   la ligne `Co-Authored-By` de la session.
 - La direction est les réseaux extrémaux en dimension 24k. On ne cherche pas à certifier l'article

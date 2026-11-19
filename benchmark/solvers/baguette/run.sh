@@ -13,7 +13,7 @@ INPUT=$1; TL=${2:-60}; ENC=${3:-2}
 BG=/scratch/arthur/baguette-b403e28
 MZN=/scratch/arthur/mzn/MiniZincIDE-2.10.1-x86_64-linux-gnu/bin/minizinc
 ENCARG=(); [ "$ENC" != - ] && ENCARG=(-D "ENC=$ENC;")   # ENC "-": the model has no ENC (e.g. linear.mzn)
-MODEL=${MODEL:-/scratch/arthur/codes-cp/models/minweight_chk.mzn}
+MODEL=${MODEL:-/cluster/arthur/codes-cp/models/minweight_chk.mzn}
 TMP=$(mktemp -d); trap 'rm -rf "$TMP"' EXIT
 t0=$(date +%s.%N)
 timeout -k 10 "$TL" "$MZN" -c --solver "$BG/tools/baguette.msc" --output-mode dzn --output-objective "${ENCARG[@]}" "$MODEL" "$INPUT" \

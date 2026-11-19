@@ -6,7 +6,7 @@
 #   u    : annotation bool_search(u, input_order, indomain_min) -- the generator rows in order
 #   u1   : same with indomain_max (pick rows first)
 # For aut.mzn the annotation is over A0 then M (the free generator bits).
-cd /scratch/arthur/codes-cp; mkdir -p models/heur
+cd /cluster/arthur/codes-cp; mkdir -p models/heur
 for v in min max; do
   sed "s/^solve satisfy;/solve :: bool_search(u, input_order, indomain_$v) satisfy;/" models/minweight.mzn > models/heur/minweight_$v.mzn
   sed "s/^solve satisfy;/solve :: bool_search([A0[i,j] | i in 1..h, j in 1..c+f] ++ [M[r,j,i] | r in 1..kr, j in 1..c-kr, i in 0..p-1], input_order, indomain_$v) satisfy;/" models/aut.mzn > models/heur/aut_$v.mzn

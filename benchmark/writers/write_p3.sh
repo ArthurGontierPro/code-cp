@@ -5,8 +5,8 @@
 #   OUTPREFIX.cnf-nosb   the same without their symmetry breaking (NOSB)
 #   OUTPREFIX.mznpar     the -D parameters for models/linear.mzn (SB=false, T=-1) and
 #   OUTPREFIX.mzndompar  for models/linear_dom.mzn (LEX=1, the column order justifiable by dominance)
-# Runs on the node (needs the AAAI repository under /scratch/arthur/codes-cp/external).
-J=$1; P=$2; B=/scratch/arthur/codes-cp; PY=/scratch/arthur/tools/venv/bin/python
+# Runs on the node (needs the AAAI repository under /cluster/arthur/codes-cp/external).
+J=$1; P=$2; B=/cluster/arthur/codes-cp; PY=/scratch/arthur/tools/venv/bin/python
 read n k d < <(python3 -c "import json; I=json.load(open('$J')); print(I['n'], I['k'], I['d'])")
 T=$(mktemp -d); trap "rm -rf $T" EXIT
 for sb in SB NOSB; do

@@ -10,7 +10,7 @@ Which solver reads which file is the table of benchmark/README.md. Choices of ph
   - no proof logging (PROOF unset everywhere)."""
 import sys, os
 
-D = os.path.abspath(sys.argv[1]); MZ = "/scratch/arthur/codes-cp/models"
+D = os.path.abspath(sys.argv[1]); MZ = "/cluster/arthur/codes-cp/models"
 MZN = ["chuffed", "gecode", "cpsat", "highs-mzn", "gcs", "baguette", "baguette-act", "pumpkin", "huub"]
 out = []
 for line in open(f"{D}/MANIFEST.tsv"):

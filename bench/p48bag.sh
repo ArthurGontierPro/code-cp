@@ -2,7 +2,7 @@
 # p48bag.sh -- certify P48p and P48q extremal (no vector of norm <= 4) with baguette, the three cases
 # of the split (shortvec.mzn header). Two searches: default, and int_search(u, input_order,
 # indomain_min) (codeword coefficients, 0 first). TL 48 h, 120 GB per run.
-cd /scratch/arthur/codes-cp; mkdir -p models/heur
+cd /cluster/arthur/codes-cp; mkdir -p models/heur
 sed "s/^solve satisfy;/solve :: int_search(u, input_order, indomain_min) satisfy;/" models/shortvec.mzn > models/heur/shortvec_u.mzn
 export TL=172800 MEM=120000000
 for L in p48q p48p; do for m in shortvec heur/shortvec_u; do t=$(basename $m | sed 's/shortvec_\?//'); t=${t:-def}
