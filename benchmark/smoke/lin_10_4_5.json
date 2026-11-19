@@ -1,0 +1,1 @@
+{"family": "P3", "name": "lin_10_4_5", "n": 10, "k": 4, "d": 5, "griesmer": 11, "expected": "UNSAT", "source": "Griesmer bound 11 > n, so no such code"}
