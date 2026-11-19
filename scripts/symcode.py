@@ -99,7 +99,7 @@ for t, c in enumerate(fixed):
 widx = {w: i for i, w in enumerate(words)}
 inverse = lambda g: [g.index(j) for j in range(n)]
 bits = lambda w: [(w >> j) & 1 for j in range(n)]
-out = os.path.join(B, "dom", f"sym_p{p}_w{Wmax}")
+out = os.path.join(B, "dom", f"sym_p{p}_w{Wmax}" + ("" if nfix == 3 else f"_f{nfix}"))
 with open(out + ".dzn", "w") as f:
     f.write(f"n = {n}; nW = {len(words)}; Wmax = {Wmax}; wd = {d};\n")
     f.write("W = [|" + "|".join(",".join(map(str, bits(w))) for w in words) + "|];\n")
