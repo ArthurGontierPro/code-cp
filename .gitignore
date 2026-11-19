@@ -15,3 +15,5 @@ dom/*.dzn
 dom/*.json
 dom/*.sol*
 dom/*.err*
+benchmark/instances/
+benchmark/results/

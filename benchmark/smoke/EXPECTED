@@ -1,0 +1,6 @@
+# file                 expected answer (Golay [24,12,8]: d = 8, 759 words of weight 8)
+golay24_w4.*           UNSAT   (no nonzero word of weight <= 4)
+golay24_w8.*           SAT     (a word of weight 8 exists)
+golay24_opt.*          OPTIMUM value=8   (minimum weight of a nonzero word)
+golay24_count.cnf      759 models projected on x1..x24 (words of weight exactly 8)
+golay24_*.json         canonical form, input of the trellis DP (solvers/trellis-dp)

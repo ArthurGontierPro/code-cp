@@ -1,0 +1,1 @@
+dynamic programming (Viterbi on the syndrome trellis), our own Python code; input: canonical .json; proves nothing (the computation is exhaustive and small enough to reread)
