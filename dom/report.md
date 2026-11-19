@@ -27,6 +27,13 @@ constraint solvers follow the same fixed branching order.
    Dedicated minimum-distance algorithms (Brouwer–Zimmermann, as implemented in Magma) settle
    QR48 faster still, but produce no certificate. Our interest is in proofs a checker can verify,
    and in what these instances reveal about solvers.
+5. **SAT solvers put points 1 and 2 in perspective.** Kissat on the plain XOR clauses, with its own
+   search and restarts, needs as few conflicts as RoundingSat on the sums (117,716 against 119,591
+   without symmetry) and is eight times faster. CryptoMiniSat, given the parity checks as native
+   XORs, does Gaussian elimination on them: the 17,296 checks then cost nothing (the same conflict
+   counts as with 24), and it is the fastest solver in every series. So the advantage of PB learning
+   over clause learning seen in points 1 and 2 holds against lazy clause generation under a fixed
+   search, not against a modern CDCL solver.
 
 ## 1. The question and what is certified
 
@@ -170,6 +177,38 @@ Orbit, sum, three coordinates fixed, with `BAGUETTE_PB_ANALYSIS=off` (clause lea
 **29,771 nodes in 1,788 s, no answer**, against 1,273 nodes and 89 s with it. GCS, which learns
 nothing, needs 29,779 nodes on the same search.
 
+### 4.6 SAT solvers
+
+The same instances as DIMACS (`scripts/gencnf.py`): the 48 bits, each parity check either as a native
+XOR of CryptoMiniSat (5.18.0) or as the same XOR clauses that baguette receives, Σ x ≥ 1 as one clause,
+Σ x ≤ Wmax as a totalizer (pysat), and the same fixed-coordinate clauses. CryptoMiniSat runs with
+Gaussian elimination (its default) and without it (`--maxnummatrices 0`). Kissat 4.0.2 runs on the
+clauses. All use their own search. Each cell: conflicts · time.
+
+| | basis, XOR clauses | basis, native XOR | orbit, XOR clauses | orbit, native XOR |
+|---|---|---|---|---|
+| **3 coordinates fixed** | | | | |
+| Kissat | 3,140 · 0.1 s | | 1,187 · 3.2 s | |
+| CryptoMiniSat, Gauss | 1,521 · 0.2 s | 2,661 · 0.1 s | 1,996 · 49 s | 2,661 · 0.2 s |
+| CryptoMiniSat, no Gauss | | 4,971 · 0.2 s | | 1,491 · 0.5 s |
+| **2 coordinates fixed** | | | | |
+| Kissat | 12,428 · 0.3 s | | 5,199 · 6.0 s | |
+| CryptoMiniSat, Gauss | 5,791 · 0.3 s | 6,042 · 0.2 s | 5,934 · 60 s | 6,042 · 0.2 s |
+| CryptoMiniSat, no Gauss | | 19,906 · 0.4 s | | 5,692 · 1.4 s |
+| **no symmetry breaking** | | | | |
+| Kissat | 117,716 · 3.0 s | | 38,025 · 48 s | |
+| CryptoMiniSat, Gauss | 69,393 · 1.8 s | 81,276 · 1.8 s | 53,839 · 336 s | 69,880 · 1.6 s |
+| CryptoMiniSat, no Gauss | | 216,570 · 4.3 s | | 82,977 · 21 s |
+| **weight ≤ 4** | | | | |
+| Kissat | 2,630 · 0.1 s | | 551 · 3.3 s | |
+| CryptoMiniSat, Gauss | 1,303 · 0.2 s | 1,235 · 0.1 s | 1,221 · 61 s | 1,173 · 0.2 s |
+| CryptoMiniSat, no Gauss | | 2,061 · 0.2 s | | 1,092 · 0.4 s |
+
+With native XORs and Gaussian elimination, CryptoMiniSat builds one 24 × 47 matrix whatever the
+number of checks (its log says so), and the orbit gives exactly the conflict counts of the basis
+(2,661 and 6,042). One difference with the PB solvers is not controlled: they receive the weight
+bound as one linear inequality, the SAT solvers as a totalizer.
+
 ## 5. What the numbers say
 
 ### 5.1 Clause learning sees the same problem in every variant
@@ -208,7 +247,22 @@ program tests each one (`scripts/learnedlp.py`):
 - 300 are not implied by any of these. Whether they follow linearly from all 17,296 equations, or
   needed rounding (division), is being computed.
 
-### 5.4 Redundancy
+### 5.4 Against SAT solvers
+
+Conflicts and nodes are different counters, but the orders of magnitude are clear. Without
+symmetry breaking, on the basis: Kissat 117,716 conflicts (clauses), RoundingSat 119,591 (sums) and
+319,736 (clauses), CryptoMiniSat 69,393 to 81,276, Chuffed about 280,000 failures under the fixed
+search. A CDCL solver with its own branching, restarts and clause management learns from the XOR
+clauses about as well as RoundingSat learns from the sums. RoundingSat's own clause learning is the
+weaker one here. What made the PB learners look strong in sections 5.1 and 5.2 is partly the
+comparison: Chuffed and baguette's clause path under a fixed search. With the sums, baguette's
+fixed-search node counts (2,099 with three coordinates, 8,253 with two) are still the smallest of all
+solvers, but its cost per node makes it the slowest.
+
+Gaussian elimination is what a parity problem calls for: CryptoMiniSat with it is the fastest
+everywhere, and it is the only solver for which the redundant orbit costs nothing.
+
+### 5.5 Redundancy
 
 The orbit is 720 times redundant. Every solver pays for it per node. For the PB learners it sometimes
 reduces the search further (baguette 1,273 nodes against 2,099, RoundingSat 930 conflicts against
@@ -233,9 +287,10 @@ algorithms are much faster. What a solver with proof logging adds is a certifica
 ## 7. Limits
 
 One code, one machine shared with other jobs, single runs, timeouts of one or two hours, an old
-baguette binary. RoundingSat does not use the shared search order. Section 5.3 is interim. Natural
-next steps: CryptoMiniSat (Gaussian elimination on XOR clauses) on the XOR variants, the same design
-on QR72 and QR80, and baguette's current version.
+baguette binary. RoundingSat, Kissat and CryptoMiniSat use their own search, the CP solvers a common
+fixed one. The SAT solvers get the weight bound as a totalizer. Section 5.3 is interim. Natural next
+steps: the same design on QR72 and QR80, where the searches are much larger, and baguette's current
+version.
 
 ## 8. Changes from the first version
 
