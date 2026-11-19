@@ -1,256 +1,274 @@
-# One model of a binary code, three solvers: where a pseudo-Boolean learner beats lazy clause generation
+# Same code, same search, two ways to write a parity check: pseudo-Boolean learning against clause learning
 
-*codes-cp, 2026-11-19. Measurements from 2026-11-18 on one shared compute node. Everything needed to
-rerun them is listed at the end.*
+*codes-cp, interim version of 2026-11-19 (the first version, of the same morning, was reviewed and
+is superseded; section 8 lists what changed). Some cells are still running and are marked so.*
 
 ## Summary
 
-We ask a constraint solver to show that the extended quadratic residue code QR48, a binary
-[48, 24, 12] code, has no nonzero word of weight at most 8. We write the code in two equivalent ways:
+We ask four solvers to prove that the extended quadratic residue code QR48, the binary
+[48, 24, 12] code, has no nonzero word of weight at most 8. We vary two things independently in the
+model: which parity checks define the code (a basis of 24, or all 17,296 minimum-weight words), and
+how each parity check is written (as a chain of XORs, or as an integer equation Σ x = 2y). The three
+constraint solvers follow the same fixed branching order.
 
-- the **systematic model**, the usual one, with 24 free bits and XOR chains for the other 24;
-- a **symmetric model**, with one parity equation for each of the 17,296 minimum-weight words of the
-  code.
+1. **For the solvers that learn clauses or nothing, the model does not matter for the search.**
+   Chuffed (lazy clause generation) visits exactly the same number of nodes in all four variants:
+   14,890 with three coordinates fixed, 54,350 with two, about 560,000 with none. GCS, which does
+   not learn, visits exactly twice as many, also identical across variants.
+2. **For the solvers that learn pseudo-Boolean constraints, writing parity as an integer equation
+   changes the search.** With the same 24 parity checks, baguette goes from 29,779 nodes (XOR
+   clauses) to 2,099 (sums). RoundingSat, with its own search, goes from 9,960 conflicts to 3,200,
+   and without symmetry from 319,736 to 119,591.
+3. **Redundancy is not what helps.** Adding all 17,296 checks makes every solver slower per node.
+   It reduces the search of the PB learners somewhat more in some cases (baguette 1,273 nodes
+   against 2,099) and increases it in others (11,491 against 1,219 at weight ≤ 4).
+4. **In wall-clock time, Chuffed on the plain model remains as fast as anything here**, RoundingSat is
+   level with it or close, and baguette (an older binary) loses by its cost per node.
+   Dedicated minimum-distance algorithms (Brouwer–Zimmermann, as implemented in Magma) settle
+   QR48 faster still, but produce no certificate. Our interest is in proofs a checker can verify,
+   and in what these instances reveal about solvers.
 
-On the systematic model, Chuffed (lazy clause generation) proves the result in 7.6 s. Our solver
-baguette, which learns pseudo-Boolean (PB) constraints, does not finish in an hour.
+## 1. The question and what is certified
 
-On the symmetric model the roles swap. Chuffed and GCS do not finish in an hour. Baguette finishes in
-33 minutes, after visiting 26 times fewer nodes than Chuffed, and its proof is checked by VeriPB. With
-its PB conflict analysis switched off, it does not finish either.
+A binary linear code C of length n is a subspace of GF(2)^n, and its minimum distance d is the
+smallest number of ones in a nonzero codeword. For a prime p ≡ −1 mod 8, the extended quadratic
+residue code of length p + 1 is self-dual (C⊥ = C) and doubly even (every weight is a multiple of 4).
+QR48 (p = 47) has d = 12, and it is the only self-dual doubly even [48, 24, 12] code (Houghten, Lam,
+Thiel and Parker, 2003). Since weights 9 to 11 cannot occur, **d = 12 follows from: no nonzero
+codeword of weight ≤ 8.** That is the UNSAT question of every run below. One series asks for
+weight ≤ 4 instead, an easier question about the same code.
 
-The constraints that baguette learns explain the difference. Most of them add or subtract two
-parity equations, and the variables the two words share cancel out. This is one step of Gaussian
-elimination over GF(2). It can be written with cutting planes, but not with clauses. The symmetric
-model gives the solver integer sums to combine. The systematic model, flattened to clauses, gives it
-nothing to combine.
+The solvers' proofs certify the unsatisfiability of the pseudo-Boolean (PB) model they were given,
+and VeriPB checks them. What the proofs do not cover, and what we check by separate computation, is
+that the model describes QR48: the generator matrix, self-duality, double evenness, the list of
+17,296 words of weight 12 and the rank (24) of that list. The symmetry breaking of section 2.3 is
+covered by the proof.
 
-## 1. The question
+## 2. The models
 
-A binary linear code C of length n is a subspace of GF(2)^n. Its minimum distance d is the smallest
-number of ones in a nonzero codeword. Extended quadratic residue codes of length p + 1, for a prime
-p ≡ −1 mod 8, are self-dual, so C⊥ = C, and doubly even, so every weight is a multiple of 4. QR48
-(p = 47) has d = 12, and it is the unique [48, 24, 12] self-dual doubly even code.
+### 2.1 The 2×2 design (`models/minweight_chk.mzn`)
 
-To prove d = 12, it is enough to show that **no nonzero codeword has weight ≤ 8**, because weights 9
-to 11 cannot occur in a doubly even code. That is the UNSAT question in every run below. Golay, the
-[24, 12, 8] code (p = 23), is used as a smaller check with weight ≤ 4.
+Because the code is self-dual, x ∈ GF(2)^48 is a codeword if and only if x·w is even for every w in
+a set of codewords that spans the code. We use two such sets:
 
-These codes are a step on the way to dense lattice sphere packings in dimensions 24k (Leech in
-dimension 24, the extremal lattices P48p and P48q in dimension 48). The wider project wants these
-proofs certified, which is why proof logging matters here.
+- **basis**: 24 linearly independent words of weight 12, chosen greedily;
+- **orbit**: all 17,296 words of weight 12 (rank 24, checked).
 
-## 2. Two models of the same code
-
-### 2.1 Systematic model (`models/minweight.mzn`)
-
-Write the generator matrix as G = [I | A]. A codeword is u·G = (u, u·A) for some u ∈ GF(2)^24.
-
-```minizinc
-array[1..k] of var bool: u;          % which rows are added
-array[1..m] of var bool: c;          % c = u·A, one XOR chain per column of A
-constraint forall(j in 1..m)( c[j] = xor of u[i] for A[i,j] = 1 );   % written as a chain of binary xors
-constraint sum(u) >= 1;
-constraint sum(u) + sum(c) <= Wmax;  % Wmax = 8
-```
-
-The 24 bits of u decide everything, and the XOR chains fix c as soon as u is fixed. MiniZinc
-flattens each binary XOR into a `bool_xor`. Baguette's library turns each of these into **four
-clauses**, so baguette only ever sees clauses and two cardinality sums.
-
-### 2.2 Symmetric model (`models/minweight_sym.mzn`)
-
-Because the code is self-dual, a vector x ∈ GF(2)^48 is a codeword if and only if it is orthogonal
-to every codeword. The minimum-weight words span the code (their rank is 24 for QR48 and 12 for
-Golay, checked), so it is enough to test those. We write
-each test as an integer equation:
+and two ways to write "x·w is even":
 
 ```minizinc
-array[1..n] of var bool: x;                       % the word itself, n = 48
-array[1..nW] of var 0..min(wd, Wmax) div 2: y;    % one integer per minimum-weight word w
-constraint forall(w in 1..nW)( sum(i in w)(x[i]) = 2 * y[w] );   % x·w is even
-constraint sum(x) >= 1;
-constraint sum(x) <= Wmax;
+% ENC = 1, XOR: a chain acc_1 = x_{w1}, acc_t = acc_{t-1} xor x_{wt}, and acc_12 = false
+% ENC = 2, sum: an integer y_w with
+constraint sum(i in w)(x[i]) = 2 * y[w];          % y_w in 0..4, since the weight is at most 8
 ```
 
-QR48 has nW = 17,296 words of weight 12. Each equation has 12 Boolean variables and one integer
-y_w ∈ 0..4 (4 = Wmax/2, because the sum cannot exceed the weight of x). In the PB encoding, y_w is
-written with order literals [y_w ≥ 1], …, [y_w ≥ 4], so each equation becomes two linear
-inequalities over 16 literals. With channelling and ladder clauses, baguette's .opb file has about
-86,700 constraints. The systematic model has 985.
+plus, in every variant,
 
-The equations are **720 times redundant**, since 24 parity checks would define the code. We did not
-write the model this way for speed. We wrote it because it is **invariant under the automorphism
-group** of the code, PSL(2, 47). An automorphism maps every equation to another equation of the
-model, and every variable to another variable. That lets the proof checker accept symmetry breaking
-as a proof step, using VeriPB's dominance rule with the automorphisms as witnesses (see
-`dom/README.md`). For that, the full orbit of equations is needed: the 17,296 words form a single
-orbit of PSL(2, 47), so no smaller invariant set exists.
+```minizinc
+constraint sum(x) >= 1;  constraint sum(x) <= 8;
+solve :: bool_search(x, input_order, indomain_max) satisfy;   % the same search for every CP solver
+```
+
+The usual systematic model (generator matrix G = [I | A], the word is (u, u·A), XOR chains for
+u·A, `models/minweight.mzn`) is the "basis, XOR" case up to the choice of the 24 checks. Its numbers
+are close to that cell's and are not repeated here.
+
+### 2.2 What each solver receives
+
+MiniZinc translates the model into FlatZinc using each solver's own library. On QR48 without
+symmetry breaking:
+
+| model | Chuffed and GCS receive | baguette receives | baguette's PB file (.opb) |
+|---|---|---|---|
+| basis, XOR | 249 `bool_xor` | 996 clauses (4 per XOR) | 1,094 constraints, 321 variables |
+| basis, sum | 24 `int_lin_eq` | 24 `int_lin_eq` | 218 constraints, 192 variables |
+| orbit, XOR | 143,174 `bool_xor`, 125,974 variables | 572,696 clauses | 572,794 constraints, 125,974 variables |
+| orbit, sum | 17,296 `int_lin_eq` | 17,296 `int_lin_eq` | 86,578 constraints, 69,280 variables |
+
+All variants also have 48 `bool2int` and two `int_lin_le` (the weight bounds). In baguette's
+encoding an integer y_w ∈ 0..4 becomes four *order literals* [y_w ≥ 1], …, [y_w ≥ 4], linked by
+*ladder* clauses [y_w ≥ k+1] → [y_w ≥ k], and each equation becomes two linear inequalities.
+RoundingSat reads the same .opb file as baguette, with constraint labels removed and variables
+renamed (`scripts/opb2plain.py`), so the two PB solvers see an identical encoding.
 
 ### 2.3 Symmetry breaking
 
-PSL(2, p) is 3-homogeneous on the p + 1 coordinates when p ≡ 3 mod 4. Any three coordinates of a
-minimum-weight word can therefore be moved to coordinates 1, 2, 3, and the model may require them to
-be in the support. In the symmetric model these requirements are clauses x_c ∨ ¬x_b. VeriPB checks
-them as dominance steps, so the proof contains no symmetry axiom. Results are given with and without
-this symmetry breaking.
+The automorphism group of QR48 contains PSL(2, 47), acting on the 48 coordinates, and this action is
+3-homogeneous: any 3-set of coordinates can be mapped to any other. If a codeword of weight ≤ 8
+existed, some automorphism would map three coordinates of its support to {1, 2, 3}, so we may
+require coordinates 1, 2 and 3 to be in the support. This is written as clauses: x_1 ∨ ¬x_b for every
+b ≠ 1 (if anything is in the support, 1 is), then x_2 ∨ ¬x_b for b ∉ {1, 2}, then x_3 ∨ ¬x_b for
+b ∉ {1, 2, 3}. We run three versions: three coordinates fixed (138 clauses), two (93), and none.
 
-## 3. Results
+In the orbit model these clauses need not be trusted. Each one is derived in the proof by a
+*dominance* step of VeriPB, whose witness is an automorphism written as a permutation of the model's
+variables. That requires every constraint to be mapped to another constraint of the model, which
+holds for the orbit of the 17,296 words (`dom/README.md`). It does not hold for the basis models, so
+there the clauses are axioms. This is why the redundant orbit model exists at all. (Whether some
+smaller invariant set of codewords, of another weight, would also span the code is a question we
+have not checked.)
 
-Node fataepyc-07 (AMD EPYC, 192 cores, shared, load around 55 during the runs). MiniZinc 2.10.1
-with the Chuffed it ships, GCS at commit 5882c294, baguette at commit 2c97b16, VeriPB 3.0.2. Times
-are wall-clock for solving, without flattening (3 s for the symmetric model). "Nodes" is each
-solver's own counter.
+## 3. Solvers and setup
 
-### 3.1 Without symmetry breaking (QR48, weight ≤ 8, UNSAT)
-
-| | Chuffed | GCS | baguette |
-|---|---|---|---|
-| systematic | **7.6 s**, 409,892 nodes | 27.5 s | > 1 h (113,315 nodes) |
-| symmetric | > 1 h (407,269 nodes) | > 1 h | **1,951 s**, 15,823 nodes, 7,868 PB rows learned, proof 4.2 GB, verified |
-
-### 3.2 With three coordinates fixed (QR48, weight ≤ 8, UNSAT)
-
-| | nodes | time | time per node |
-|---|---|---|---|
-| Chuffed, systematic | 11,306 | 0.13 s | 11 µs |
-| Chuffed, symmetric, default search | 28,666 (depth 17,301) | 104 s | 3.6 ms |
-| Chuffed, symmetric, search on x, 1 first | 14,891 (depth 8) | 170 s | 11 ms |
-| GCS, symmetric, default search | 21,385 | 117 s | 5.5 ms |
-| baguette, systematic | 27,178 | 128 s | 4.7 ms |
-| baguette, symmetric, default search | 1,205 | 96 s | 80 ms |
-| baguette, symmetric, search on x, 1 first | 723 | 65 s | 90 ms |
-| baguette, symmetric, **PB conflict analysis off** | ? | > 1800 s, 4.8 GB | |
-
-The merged proof (dominance steps for the symmetry, followed by baguette's proof) is 834 MB, and
-VeriPB checks it in about 4.5 minutes.
-
-### 3.3 Golay, symmetric model, no symmetry breaking (weight ≤ 4, UNSAT)
-
-| | default search | search on x |
+| solver | what it is | search |
 |---|---|---|
-| Chuffed | 10,403 nodes, 2.1 s | 430 nodes, 0.4 s |
-| GCS | > 30 min, 27.8 million nodes | 855 nodes, 0.4 s |
-| baguette | 130 nodes, 0.4 s | 130 nodes, 0.4 s |
+| Chuffed (with MiniZinc 2.10.1) | CP with lazy clause generation (LCG): every propagation is explained by a clause, and conflict analysis learns clauses | the model's annotation, strictly |
+| GCS, commit 5882c294 | Glasgow Constraint Solver, CP with VeriPB proof logging; no nogood learning | the model's annotation |
+| baguette, commit 2c97b16 | our CP solver, VeriPB proof logging; conflict analysis combines PB constraints (cutting planes: linear combination, division, saturation), with clause learning as fallback | the model's annotation |
+| RoundingSat, commit d4edbf7 | PB solver, conflict analysis by cutting planes | its own (activity-based, restarts) |
 
-## 4. Why
+Machine: one shared node (AMD EPYC, 192 cores, other jobs running, load 16 to 55). Each cell is a
+single run. Node counts are deterministic for the three CP solvers (fixed search), wall-clock times
+are not. Timeouts: 1 hour, 2 hours for the two-coordinate series, 3,600 s of baguette's own time limit
+for the ablation. Chuffed, GCS and baguette count search-tree nodes. RoundingSat reports decisions
+and conflicts, which are not the same counter. The baguette binary predates ongoing work on its cost
+per node and its search, so its times are an upper bound on what it does now.
 
-### 4.1 Chuffed: the same search, at a thousand times the cost per node
+## 4. Results (QR48, weight ≤ 8, UNSAT)
 
-On QR48, Chuffed visits about as many nodes on both models (409,892 against 407,269 without symmetry,
-and 11,306 against 14,891 with it). The redundant equations do not make its search any smaller. Each
-node, however, costs a thousand times more. Every coordinate belongs to 4,324 of the 17,296 words,
-so every decision wakes thousands of linear propagators. Chuffed performs 263 million propagations
-in 28,666 nodes, about 9,000 per node, against 3 per node on the systematic model.
+Each cell: nodes (RoundingSat: decisions / conflicts), then time.
 
-The reason the redundancy brings nothing is the form of what lazy clause generation learns. A
-linear propagator explains each inference with a clause, and conflict analysis resolves clauses into
-a new clause. Learning by resolution never adds two equations, so the 17,296 parity checks remain
-17,296 separate facts. Resolution is also known to be exponentially weak at parity reasoning (Tseitin
-formulas, Urquhart 1987), so no amount of clause learning recovers the linear algebra that is
-missing.
+### 4.1 Three coordinates fixed
 
-### 4.2 Baguette: its learned constraints are sums of parity equations
+| | basis, XOR | basis, sum | orbit, XOR | orbit, sum |
+|---|---|---|---|---|
+| Chuffed | 14,890 · 0.3 s | 14,890 · 0.4 s | 14,890 · 60 s | 14,891 · 122 s |
+| GCS | 29,779 · 0.7 s | 29,779 · 0.5 s | 29,779 · 346 s | 29,779 · 136 s |
+| baguette | 29,779 · 102 s | **2,099 · 12 s** | no answer in 2,907 s | **1,273 · 89 s** |
+| RoundingSat | 19,044 / 9,960 · 2.5 s | **5,872 / 3,200 · 0.3 s** | 4,549 / 3,501 · 200 s | 2,414 / 930 · 8.2 s |
 
-Baguette's conflict analysis works on PB constraints. It combines the reason constraints linearly,
-eliminates the pivot literal, and applies division or rounding when needed. Clause learning is used
-only as a fallback. On the symmetric model the reasons are parity equations, so the learned
-constraints are combinations of parity equations.
+### 4.2 Two coordinates fixed
 
-With symmetry, baguette learns 588 PB constraints on QR48, and 511 of them contain at least two of
-the auxiliary integers y_w. Here is one of the shortest, as it appears in the proof, rewritten with
-the model's names:
+| | basis, XOR | basis, sum | orbit, XOR | orbit, sum |
+|---|---|---|---|---|
+| Chuffed | 54,350 · 0.7 s | 54,350 · 0.9 s | 54,350 · 246 s | 54,332 · 451 s |
+| GCS | 108,699 · 1.9 s | 108,699 · 1.3 s | 108,699 · 1,178 s | 108,699 · 535 s |
+| baguette | running | **8,253 · 245 s** | running | **2,603 · 174 s** |
+| RoundingSat | 96,057 / 50,906 · 13 s | **17,072 / 9,179 · 0.9 s** | 9,348 / 7,761 · 405 s | 6,353 / 2,946 · 38 s |
 
-```
-x6 + x7 + x11 + x12 + x21 + x23 + ¬x14 + ¬x15 + ¬x16 + ¬x18 + ¬x29 + ¬x34
-  + 2·¬[y_a ≥ 1] + … + 2·¬[y_a ≥ 4] + 2·[y_b ≥ 1] + … + 2·[y_b ≥ 4]  ≥  14
-```
+### 4.3 No symmetry breaking
 
-where y_a and y_b belong to the words
+| | basis, XOR | basis, sum | orbit, XOR | orbit, sum |
+|---|---|---|---|---|
+| Chuffed | 559,649 · 7.8 s | 563,957 · 9.6 s | 559,623 · 1,734 s | running (earlier run with default search: no answer in 1 h) |
+| GCS | 1,127,913 · 17 s | 1,127,913 · 12 s | running | running |
+| baguette | running | running | no answer in 3,093 s | **15,945 nodes, about 30 min** |
+| RoundingSat | 499,121 / 319,736 · 111 s | **172,385 / 119,591 · 24 s** | 45,710 / 41,149 · 744 s | 126,703 / 86,403 · 841 s |
 
-```
-w_a = {1, 4, 6, 7, 11, 12, 19, 20, 21, 22, 23, 43}
-w_b = {1, 4, 14, 15, 16, 18, 19, 20, 22, 29, 34, 43}
-```
+### 4.4 The easier question, weight ≤ 4, no symmetry breaking
 
-which share the six coordinates {1, 4, 19, 20, 22, 43}. Replacing ¬ℓ by 1 − ℓ, the constraint reads
+| | basis, XOR | basis, sum | orbit, XOR | orbit, sum |
+|---|---|---|---|---|
+| Chuffed | 8,066 · 0.3 s | 8,208 · 0.3 s | 8,065 · 26 s | 7,884 · 47 s |
+| GCS | 16,451 · 0.5 s | 16,451 · 0.3 s | 16,451 · 221 s | 16,451 · 52 s |
+| baguette | 16,451 · 32 s | **1,219 · 3.7 s** | running | 11,491 · 450 s |
+| RoundingSat | 9,662 / 4,839 · 0.8 s | **2,529 / 1,127 · 0.1 s** | 2,143 / 1,592 · 62 s | 4,509 / 2,125 · 36 s |
 
-```
-Σ_{i ∈ w_a \ w_b} x_i − 2·y_a  ≥  Σ_{i ∈ w_b \ w_a} x_i − 2·y_b
-```
+### 4.5 Ablation: baguette without PB conflict analysis
 
-This is equation b subtracted from equation a, one direction of it. The six shared coordinates have
-cancelled. Only the symmetric difference w_a ⊕ w_b is left, which is itself a word of weight 12,
-together with the integer y_a − y_b. In other words, the solver has added two rows of the parity-check
-system, one step of Gaussian elimination over GF(2), carried out with integer arithmetic. The other two
-short learned constraints we examined have exactly the same structure.
+Orbit, sum, three coordinates fixed, with `BAGUETTE_PB_ANALYSIS=off` (clause learning only):
+**29,771 nodes in 1,788 s, no answer**, against 1,273 nodes and 89 s with it. GCS, which learns
+nothing, needs 29,779 nodes on the same search.
 
-Cutting planes can make such combinations and clauses cannot. Without symmetry, baguette learns
-7,868 such rows and needs 26 times fewer nodes than Chuffed. With symmetry, it needs about 20 times
-fewer nodes than Chuffed or GCS (18 to 24 times). Switching PB analysis off (`BAGUETTE_PB_ANALYSIS=off`, which leaves
-clause learning only) loses everything: no answer in 30 minutes, and 4.8 GB of memory.
+## 5. What the numbers say
 
-### 4.3 Why the systematic model gives baguette nothing
+### 5.1 Clause learning sees the same problem in every variant
 
-Baguette's MiniZinc library turns each XOR into four clauses. The XOR information is still present,
-but only as clauses, so there are no linear sums for PB conflict analysis to combine. On the
-systematic model, switching PB analysis off changes nothing at all (27,178 nodes either way).
-Baguette then does plain clause learning at a high cost per node, and it loses to Chuffed. The cost
-per node of this old binary is being worked on in baguette, so this gap will move, but the node
-counts above do not depend on it.
+With a fixed branching order, a solver that does not learn visits a tree determined by when
+propagation detects failure. GCS's counts are identical in all four variants, so all four encodings
+detect failure at the same nodes. Chuffed's are also identical, and half of GCS's: its learned
+clauses prune the same half of the tree whatever the encoding. Neither the integer form nor the
+16,000 extra checks give a clause learner anything to work with. They only cost propagation: on the
+orbit, Chuffed's node costs 300 to 1,000 times more than on the basis.
 
-### 4.4 A separate trap: branching on auxiliaries
+### 5.2 PB learning uses the integer form
 
-Without a search annotation, Chuffed and GCS branch over every variable declared in the model,
-including the 17,296 integers y_w. Chuffed's search depth goes up to 17,301. On QR48 this costs
-little, because the y_w are almost always fixed by propagation. On Golay without symmetry, GCS is
-lost in 27.8 million nodes when branching on the y_w, and needs 855 nodes when told to branch on x
-only. Baguette's default search, first-fail with the smallest value first, picks the Booleans x before
-the integers y and avoids this trap.
+The two PB learners, written independently, behave alike. With XOR clauses, they learn only clauses
+(baguette's clause-only search, 29,779 nodes, is exactly GCS's tree: under this fixed search its
+clause learning prunes nothing). With the integer form, their conflict analysis adds and scales the
+parity equations, and the search shrinks: by 14 times for baguette and 3 times for RoundingSat
+(conflicts) with three coordinates fixed, and by 2.7 times for RoundingSat without symmetry. The
+ablation confirms it for baguette: without PB analysis, it is back to GCS's tree.
 
-## 5. What this does and does not show
+Linear combinations of parity equations are how parity reasoning is done over the integers, which is
+the idea behind the PB parity proofs of Gocht and Nordström (2021). We do not claim more than that.
+It is not known that cutting planes do Gaussian elimination efficiently in general, and no lower bound
+for clause learning on these particular formulas is shown here.
 
-It shows that, on one structured family, PB conflict analysis turns redundant parity equations into
-Gaussian-elimination-like reasoning that clause learning cannot reproduce, and that this can beat a
-much faster solver by an order of magnitude or more in nodes. It also shows that the choice of
-encoding decides whether this happens: the same code written with XOR clauses gives the PB learner
-nothing.
+### 5.3 What baguette learns (interim)
 
-It does not show a general ranking of solvers. There is one code family, one shared machine, timeouts
-of one hour, and an old baguette binary. The solvers count nodes in different ways, and Chuffed's
-default search is not tuned for this model. Natural next comparisons are CryptoMiniSat with Gaussian
-elimination on the XOR form, RoundingSat (cutting planes) on the same .opb, and baguette's current
-version.
+On the orbit model with three coordinates fixed, baguette learns 588 PB constraints. A linear
+program tests each one (`scripts/learnedlp.py`):
 
-## 6. Reproducing
+- 85 are implied, over the reals, by the parity equations of the words they mention alone. They are
+  nonnegative combinations of axioms and add no information from the search. The example shown in the
+  first version of this report is of this kind: one half of one equation minus one half of another,
+  the six shared coordinates cancelling.
+- 203 more are implied once the weight bounds and the fixed coordinates are added.
+- 300 are not implied by any of these. Whether they follow linearly from all 17,296 equations, or
+  needed rounding (division), is being computed.
 
-All files are in the codes-cp repository. The node paths are in `bench/run1.sh`.
+### 5.4 Redundancy
+
+The orbit is 720 times redundant. Every solver pays for it per node. For the PB learners it sometimes
+reduces the search further (baguette 1,273 nodes against 2,099, RoundingSat 930 conflicts against
+3,200) and sometimes not (baguette at weight ≤ 4: 11,491 against 1,219). In wall-clock time the basis
+with sums is the best variant for both PB solvers in every series. We keep the orbit only because it
+lets the proof certify the symmetry breaking (section 2.3).
+
+## 6. Is this the right model?
+
+A fair objection is that the redundant orbit model is a strange way to state the problem. Two
+answers. First, the comparison does not depend on it: the decisive factor, integer sums against XOR
+clauses, appears just as clearly on the 24-check basis, which carries exactly the information of the
+usual systematic model. Second, each solver's best variant is in the tables. Chuffed's best is the
+basis with XOR (or sums, the same), and it is as fast as anything here. RoundingSat's best is the
+basis with sums. Baguette's best is the basis with sums too. Nobody is compared on a model chosen to
+handicap them. The orbit model is there for a different reason (certified symmetry breaking) and is
+reported as such.
+
+For computing d(QR48) itself, constraint solving is not the right tool: dedicated minimum-distance
+algorithms are much faster. What a solver with proof logging adds is a certificate.
+
+## 7. Limits
+
+One code, one machine shared with other jobs, single runs, timeouts of one or two hours, an old
+baguette binary. RoundingSat does not use the shared search order. Section 5.3 is interim. Natural
+next steps: CryptoMiniSat (Gaussian elimination on XOR clauses) on the XOR variants, the same design
+on QR72 and QR80, and baguette's current version.
+
+## 8. Changes from the first version
+
+The first version compared only "systematic with XOR" against "orbit with sums", which mixed two
+factors. It explained baguette's advantage by redundancy and called a learned constraint a Gaussian
+elimination step, although that constraint was a plain sum of two axioms. It cited Tseitin formulas
+without a lower bound for this problem, compared node counts taken at timeouts, and used different
+searches for different solvers. The 2×2 design, the common search, RoundingSat, the ablation with
+node counts, the two-coordinate instance (where Chuffed finishes) and the classification of learned
+constraints answer these points.
+
+## 9. Reproducing
+
+All files are in the codes-cp repository. Solver paths are at the top of `bench/run1.sh` and
+`bench/rs1.sh`.
 
 ```sh
-# instances: code, minimum-weight words, automorphisms used as witnesses
-python3 scripts/symcode.py 47 8 3          # writes dom/sym_p47_w8.dzn (+ .json)
-# the comparison (Chuffed, GCS, baguette x 4 model variants x Golay and QR48)
-bash bench/sym.sh                          # results/runs/SYM_*
-bash bench/symheur.sh                      # search annotations, results/runs/SH_*
-# PB analysis on/off
-BAGUETTE_PB_ANALYSIS=off main.exe dom/sym_p47_w8.fzn --stats
-# baguette's proof with the symmetry breaking derived by dominance, checked by VeriPB
-bash dom/run.sh sym_p47_w8
+python3 scripts/symcode.py 47 8 3      # dom/sym_p47_w8.dzn: the 17,296 words, 3 fixed coordinates
+python3 scripts/symcode.py 47 8 2      # dom/sym_p47_w8_f2.dzn: 2 fixed coordinates
+python3 scripts/basisdzn.py dom/sym_p47_w8.dzn dom/sym_p47_w8_basis.dzn   # a basis of 24
+bash bench/x2.sh; bash bench/x2f2.sh; bash bench/x2rs.sh                 # results/runs/X2_*
+python3 scripts/learnedlp.py dom/sym_p47_w8.fzn dom/sym_p47_w8.pbp       # section 5.3
 ```
 
 ## References
 
-- G. S. Tseitin, On the complexity of derivation in propositional calculus, 1968.
-- A. Urquhart, Hard examples for resolution, J. ACM 34(1), 1987.
-- W. Cook, C. R. Coullard, Gy. Turán, On the complexity of cutting-plane proofs, Discrete Applied
-  Math. 18, 1987.
-- O. Ohrimenko, P. J. Stuckey, M. Codish, Propagation via lazy clause generation, Constraints 14(3),
-  2009 (Chuffed's approach).
-- J. Elffers, J. Nordström, Divide and conquer: towards faster pseudo-Boolean solving, IJCAI 2018
-  (RoundingSat).
-- M. Soos, K. Nohl, C. Castelluccia, Extending SAT solvers to cryptographic problems, SAT 2009
-  (Gaussian elimination in CryptoMiniSat).
-- S. Gocht, J. Nordström, Certifying parity reasoning efficiently using pseudo-Boolean proofs, AAAI
-  2021.
+- W. C. Huffman, V. Pless, *Fundamentals of Error-Correcting Codes*, Cambridge, 2003 (QR codes, PSL(2, p)).
+- S. K. Houghten, C. W. H. Lam, L. H. Thiel, J. A. Parker, The extended quadratic residue code is the
+  only (48, 24, 12) self-dual doubly-even code, IEEE Trans. Inf. Theory 49(1), 2003.
+- O. Ohrimenko, P. J. Stuckey, M. Codish, Propagation via lazy clause generation, Constraints 14(3), 2009.
+- J. Elffers, J. Nordström, Divide and conquer: towards faster pseudo-Boolean solving, IJCAI 2018.
+- W. Cook, C. R. Coullard, Gy. Turán, On the complexity of cutting-plane proofs, Discrete Appl. Math. 18, 1987.
+- S. Gocht, J. Nordström, Certifying parity reasoning efficiently using pseudo-Boolean proofs, AAAI 2021.
 - B. Bogaerts, S. Gocht, C. McCreesh, J. Nordström, Certified dominance and symmetry breaking for
   combinatorial optimisation, JAIR 77, 2023.
+- M. Soos, K. Nohl, C. Castelluccia, Extending SAT solvers to cryptographic problems, SAT 2009.
