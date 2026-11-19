@@ -87,3 +87,25 @@ et les 91 runs donnent la réponse attendue (`run/smoke-result.txt`).
   `/scratch/arthur/tools/bench/gurobi/lic-<hostname>/gurobi.lic` (obtenu avec `grbgetkey --path`, jamais commité),
   valable jusqu'au 19/11/2027 sur fataepyc-07.
 - Bitwuzla (pas d'arithmétique entière) et msolve (FLINT manquant) ne sont pas installés.
+
+## Lancer et lire une campagne
+
+Tout se fait sur le nœud, depuis `benchmark/`, avec `PY=/scratch/arthur/tools/venv/bin/python`.
+
+1. `$PY gen/phase1.py instances/phase1` construit les 115 instances de la phase 1 et leur
+   `MANIFEST.tsv`. Chaque réponse P1 est d'abord recalculée à partir des seules matrices de parité
+   par `verify/verify_p1.py` (énumération sur deux ensembles d'information, `verify/mindist2.c`,
+   compilé avec `gcc -O3 -fopenmp -o verify/mindist2 verify/mindist2.c`). Un désaccord arrête tout.
+2. `$PY run/jobs.py instances/phase1 > instances/phase1-jobs.tsv` écrit un run par ligne
+   (instance, écriture, solveur).
+3. `setsid nohup bash run/campaign.sh instances/phase1-jobs.tsv results/phase1-p1 600 92 &` lance
+   92 runs à la fois, chacun dans son scope systemd avec `MemoryMax=32G`. Un run déjà fait (son `.res`
+   existe) est sauté, donc relancer la même commande après avoir ajouté un solveur ne lance que ses
+   runs. Le PID du lanceur est dans `results/phase1-p1/pid`, et `results/phase1-p1/done` apparaît à
+   la fin. L'arrêt se fait par ce PID, puis par les scopes `b1-*` (voir l'en-tête de `campaign.sh`).
+4. `$PY run/score.py results/phase1-p1 600` donne, par solveur et par écriture, les runs, les
+   instances résolues, les réponses fausses et le PAR-2. `run/best.py` donne le meilleur solveur par
+   groupe d'instances et par écriture.
+
+État au 19/11 au soir : la première passe est faite (2 687 runs, Gurobi et `baguette-act` compris,
+aucune réponse fausse). Le résumé est dans `notes/etat.md`.

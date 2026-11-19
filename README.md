@@ -59,6 +59,6 @@ dit lequel. `launch.sh`, `job.sh` et `instances.csv` forment le benchmark AAAI-2
 
 ## Où ça tourne
 
-Toutes les expériences tournent sur fataepyc-07, dans `/scratch/arthur/codes-cp` (copie synchronisée
-de ce dépôt), jamais sur le portable. Le portable ne fait qu'aplatir et vérifier les modèles. Les
-chemins des solveurs sont en tête de `bench/run1.sh`.
+Toutes les expériences tournent sur fataepyc-07, dans `/scratch/arthur/codes-cp`, un clone de ce dépôt
+mis à jour par `git pull`. La machine, ses outils et ses règles sont décrits dans `notes/noeud.md`.
+Une session Claude commence par `CLAUDE.md`, puis `notes/etat.md`.

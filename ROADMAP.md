@@ -26,11 +26,11 @@ tourne et ce qui vient ensuite.
 
 ## En cours sur le nœud
 
-- La certification de P48 par baguette (`bench/p48bag.sh`) et ses tests d'équivalence (52 millions de
-  vecteurs).
-- La preuve baguette de QR104 et de QR80 avec les symétries du code (`bench/fix.sh`, `c104rbag.sh`).
-- Les boucles paresseuses du modèle d'automorphismes sont arrêtées (18/11). Elles ne convergeaient
-  pas, même en longueur 48. Seul l'ordre 23 en longueur 48 a abouti, et il retrouve QR48.
+Rien au 19/11 au soir. La certification de P48 par baguette et ses tests d'équivalence ont été arrêtés
+le 19/11 (ancien binaire, 52 millions de vecteurs à énumérer sans résultat en 28 h). Les boucles
+paresseuses du modèle d'automorphismes sont arrêtées depuis le 18/11. Elles ne convergeaient pas, même
+en longueur 48. Seul l'ordre 23 en longueur 48 a abouti, et il retrouve QR48. Ce qui reste à faire est
+listé dans `notes/etat.md`.
 
 ## Ensuite
 
@@ -84,8 +84,8 @@ Un benchmark multi-paradigmes (ajouté le 19/11, à faire plus tard)
    écritures, avec la réponse connue. On y lancerait le meilleur solveur de chaque paradigme : SAT,
    SAT avec XOR, PB, CP, MILP, MaxSAT, ASP, SMT, comptage, programmation dynamique sur treillis,
    recherche locale, QUBO, avec les algorithmes dédiés comme référence. Les problèmes, les
-   écritures, les solveurs, la méthode et les phases sont dans `notes/benchmark-plan.md`. La phase 1
-   (distance minimale et existence de codes) réutilise presque tout l'outillage du 18/11 et du
-   19/11.
+   écritures, les solveurs, la méthode et les phases sont dans `notes/benchmark-plan.md`. La
+   première passe de la phase 1 (distance minimale et existence de codes, 10 min par run) est faite
+   le 19/11, voir `benchmark/README.md` et `notes/etat.md`.
 
 Ordre proposé : 7, puis 1, avec 4 en parallèle côté baguette. 2 et 6 font de bons sujets d'étudiant.
