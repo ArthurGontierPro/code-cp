@@ -125,3 +125,5 @@ sa recherche (M10, M11), donc ses chiffres sont ceux d'une version déjà dépas
   que Chuffed, et il ne finit pas la forme systématique, où il n'apprend que des clauses. Sur ces
   problèmes, l'apprentissage PB vaut donc plus que le coût par nœud, à condition que le modèle lui
   donne des sommes à combiner.
+
+Un rapport en anglais sur le modèle symétrique et l'apprentissage PB de baguette : `dom/report.md`.
