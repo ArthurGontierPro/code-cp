@@ -113,6 +113,15 @@ sa recherche (M10, M11), donc ses chiffres sont ceux d'une version déjà dépas
   raisonner sur les XOR, chose que des clauses ne savent pas faire. Sans cette analyse, il ne
   finit pas. Sur la forme systématique, elle ne change rien (mêmes 27 178 nœuds), parce que les
   XOR y sont des clauses. Le prix est un nœud 20 fois plus cher que sur la forme systématique.
-- Sans les trois coordonnées imposées, aucun solveur ne finit le modèle symétrique en 30 minutes,
-  alors que la forme systématique se fait en 7,6 s (Chuffed). La symétrie est donc indispensable à
-  ce modèle, et c'est justement ce qu'on sait maintenant prouver.
+- Sans les trois coordonnées imposées, les rôles s'inversent complètement :
+
+  | sans symétrie | Chuffed | GCS | baguette |
+  |---|---|---|---|
+  | forme systématique | 7,6 s, 409 892 nœuds | 27,5 s | pas fini en 1 h (113 315 nœuds) |
+  | modèle symétrique | pas fini en 1 h (407 269 nœuds) | pas fini en 1 h | 1 951 s, 15 823 nœuds, 7 868 PB appris, preuve de 4,2 Go vérifiée |
+
+  Chuffed fait le même nombre de nœuds sur les deux modèles, mais 500 fois plus lentement sur le
+  modèle symétrique. Baguette est le seul à finir le modèle symétrique, avec 26 fois moins de nœuds
+  que Chuffed, et il ne finit pas la forme systématique, où il n'apprend que des clauses. Sur ces
+  problèmes, l'apprentissage PB vaut donc plus que le coût par nœud, à condition que le modèle lui
+  donne des sommes à combiner.
