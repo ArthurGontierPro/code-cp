@@ -20,11 +20,9 @@ fichiers par sujet ci-dessous, à lire selon la tâche plutôt que d'un bloc.
 - Le dépôt est public (github.com/ArthurGontierPro/code-cp). Jamais de PDF d'article (ils sont
   ignorés par git et restent dans `papers/`), jamais de données privées, jamais d'adresse mail ni de
   clé ou de fichier de licence.
-- Sur le nœud, on ne tue jamais par motif (`pkill`, `killall`, `kill` sur un nom). On lance `ps`, on
-  lit la liste, et on tue seulement les PID qu'on a lancés soi-même. Chaque run détaché écrit son PID
-  dans un fichier à côté de sa sortie. Les runs `ladbug` (`/scratch/arthur/ladbug-*`) ne sont pas à
-  nous, on n'y touche pas.
-- Au plus 92 runs en parallèle, chacun limité à 32 Go réels (`benchmark/run/campaign.sh` le fait).
+- Les règles de la machine (tuer par PID, parallélisme, mémoire) sont dans le `~/.claude/CLAUDE.md` du
+  nœud. Propre à ce projet : les runs `ladbug` (`/scratch/arthur/ladbug-*`) ne sont pas à nous, et
+  `benchmark/run/campaign.sh` applique déjà la limite de 92 runs à 32 Go chacun.
 - On ne commite que des chemins explicites, jamais `git add -A`. Les messages de commit finissent par
   la ligne `Co-Authored-By` de la session.
 - La direction est les réseaux extrémaux en dimension 24k. On ne cherche pas à certifier l'article
