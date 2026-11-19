@@ -1,1 +1,1 @@
-{"family": "P3", "name": "lin_10_4_4", "n": 10, "k": 4, "d": 4, "griesmer": 8, "expected": "SAT", "source": "Griesmer bound 8 <= n; SAT checked: a [10,4,4] code was found by Kissat and Chuffed on 2026-11-19"}
+{"family": "P3", "name": "lin_10_4_4", "n": 10, "k": 4, "d": 4, "griesmer": 8, "expected": "SAT", "source": "Griesmer bound 8 <= n; SAT: a [10,4,4] code was found by Kissat and Chuffed on 2026-11-19"}
