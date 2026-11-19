@@ -78,4 +78,14 @@ Chaîne de confiance
    avec un modèle symétrique et les preuves de baguette, en une seule preuve VeriPB (`dom/`).
 8. Recoller les cas et les moitiés par des conclusions ¬cube et un fichier qui les combine.
 
+Un benchmark multi-paradigmes (ajouté le 19/11, à faire plus tard)
+
+9. Une liste aussi complète que possible des problèmes de codes et de réseaux, chacun sous plusieurs
+   écritures, avec la réponse connue. On y lancerait le meilleur solveur de chaque paradigme : SAT,
+   SAT avec XOR, PB, CP, MILP, MaxSAT, ASP, SMT, comptage, programmation dynamique sur treillis,
+   recherche locale, QUBO, avec les algorithmes dédiés comme référence. Les problèmes, les
+   écritures, les solveurs, la méthode et les phases sont dans `notes/benchmark-plan.md`. La phase 1
+   (distance minimale et existence de codes) réutilise presque tout l'outillage du 18/11 et du
+   19/11.
+
 Ordre proposé : 7, puis 1, avec 4 en parallèle côté baguette. 2 et 6 font de bons sujets d'étudiant.
