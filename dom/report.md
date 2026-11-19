@@ -251,7 +251,7 @@ program tests each one (`scripts/learnedlp.py`):
 
 Conflicts and nodes are different counters, but the orders of magnitude are clear. Without
 symmetry breaking, on the basis: Kissat 117,716 conflicts (clauses), RoundingSat 119,591 (sums) and
-319,736 (clauses), CryptoMiniSat 69,393 to 81,276, Chuffed about 280,000 failures under the fixed
+319,736 (clauses), CryptoMiniSat 69,393 to 81,276, Chuffed 559,649 failures under the fixed
 search. A CDCL solver with its own branching, restarts and clause management learns from the XOR
 clauses about as well as RoundingSat learns from the sums. RoundingSat's own clause learning is the
 weaker one here. What made the PB learners look strong in sections 5.1 and 5.2 is partly the
