@@ -85,7 +85,9 @@ for fmt in fmts:
             head += "min: " + " ".join(f"+1 x{v}" for v in X) + " ;\n"
         open(path, "w").write(head + "\n".join(lines) + "\n")
     elif fmt in ("lp", "opt-lp"):
-        L = ["Minimize", " obj: " + " + ".join(f"x{v}" for v in X), "Subject To"]
+        # decision files have a zero objective (a feasibility problem); only opt-lp minimises the weight
+        obj = " + ".join(f"x{v}" for v in X) if fmt == "opt-lp" else "0 x1"
+        L = ["Minimize", " obj: " + obj, "Subject To"]
         for t, r in enumerate(rows):
             L.append(f" p{t + 1}: " + " + ".join(f"x{v}" for v in r) + f" - 2 y{t + 1} = 0")
         L.append(" nz: " + " + ".join(f"x{v}" for v in X) + " >= 1")
