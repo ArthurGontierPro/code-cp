@@ -38,6 +38,20 @@ Pour aplatir un modèle pour baguette, on passe sa bibliothèque à MiniZinc ave
 `-c --solver /scratch/arthur/baguette-b403e28/tools/baguette.msc`, puis on lance `main.exe` sur le
 `.fzn` (voir `benchmark/solvers/baguette/run.sh`).
 
+## /scratch et /cluster
+
+`/scratch` (13 To, local, rapide) est l'endroit où l'on travaille, mais il peut être effacé par une
+réinstallation ou une panne. `/cluster` (NFS, partagé par le groupe, permanent, plus lent) garde une
+copie de ce que git ne contient pas. `bash scripts/save.sh` copie dans `/cluster/arthur/codes-cp-save`
+les sorties des runs sans les preuves brutes `.pbp` (régénérables, plus de 50 Go), `dom/` sans ses
+`.pbp`, les instances et les résultats du benchmark, les PDF, les fichiers `VERSION` des solveurs et
+les licences Gurobi. Le dossier est en mode 700, parce que `/cluster/arthur` est ouvert en écriture à
+tous. On le lance en fin de session, rsync ne recopie que ce qui a changé.
+
+Ce qui n'est pas sauvé se reconstruit : le code depuis GitHub, les solveurs avec leurs
+`benchmark/solvers/*/install.sh` (environ 4 Go dans `/scratch/arthur/tools`), baguette b403e28 depuis
+son dépôt GitHub, les preuves en relançant les runs.
+
 ## Où vont les sorties
 
 - `results/runs/` : les runs des scripts `bench/` (ignoré par git, 63 Go le 19/11).
