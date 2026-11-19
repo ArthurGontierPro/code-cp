@@ -4,7 +4,8 @@
 # MiniZinc 2.10.1 against baguette's mznlib, then runs main.exe --stats --time-limit (TL minus the
 # flattening time); its output goes through MiniZinc's solns2out. The reported time includes the
 # flattening.
-# Env: MODEL overrides the model; PROOF=PREFIX also writes PREFIX.opb / PREFIX.pbp (--proof).
+# Env: MODEL overrides the model; PROOF=PREFIX also writes PREFIX.opb / PREFIX.pbp (--proof);
+# BAGUETTE_FLAGS adds main.exe options (solvers/baguette-act sets them).
 NAME=baguette
 # temporary files stay on the node's scratch, not in /tmp
 export TMPDIR=${BENCH_TMPDIR:-/scratch/arthur/tools/bench/tmp}; mkdir -p "$TMPDIR"
@@ -23,6 +24,7 @@ left=$(python3 -c "print(max(1, round($TL - $el, 1)))")   # --time-limit takes f
 LOG=$TMP/log
 if [ $frc -eq 0 ]; then
   EXTRA=(); [ -n "$PROOF" ] && EXTRA+=(--proof "$PROOF")
+  read -ra BF <<< "${BAGUETTE_FLAGS:-}"; EXTRA+=("${BF[@]}")
   # main.exe's stdout goes through solns2out (the .ozn) so that _objective is printed; its stderr
   # (the stats line) goes straight to ours
   ( timeout -k 10 $((TL + 60)) "$BG/_build/default/bin/main.exe" "$TMP/m.fzn" --stats --time-limit "$left" "${EXTRA[@]}"

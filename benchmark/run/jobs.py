@@ -11,7 +11,7 @@ Which solver reads which file is the table of benchmark/README.md. Choices of ph
 import sys, os
 
 D = os.path.abspath(sys.argv[1]); MZ = "/scratch/arthur/codes-cp/models"
-MZN = ["chuffed", "gecode", "cpsat", "highs-mzn", "gcs", "baguette", "pumpkin", "huub"]
+MZN = ["chuffed", "gecode", "cpsat", "highs-mzn", "gcs", "baguette", "baguette-act", "pumpkin", "huub"]
 out = []
 for line in open(f"{D}/MANIFEST.tsv"):
     if line.startswith("#"):
