@@ -17,3 +17,4 @@ dom/*.sol*
 dom/*.err*
 benchmark/instances/
 benchmark/results/
+benchmark/verify/mindist2
