@@ -13,7 +13,7 @@ les instances de test (`smoke/`) sont suivies par git.
 | `writers/` | `write.py` : de la forme canonique vers chaque format (CNF, CNF+XOR, OPB, WCNF, LP, ASP, SMT-LIB, DZN) |
 | `solvers/NOM/` | `install.sh` (installe dans `/scratch/arthur/tools/bench/NOM`, idempotent) et `run.sh` (interface commune ci-dessous) |
 | `smoke/` | les instances de test de chaque format (Golay), avec leur réponse attendue |
-| `run/` | le lanceur commun et la collecte des résultats |
+| `run/` | `smoke.sh` (tous les solveurs sur les instances de test), puis le lanceur commun et la collecte des résultats |
 
 ## La forme canonique (famille P1, distance minimale)
 
@@ -56,3 +56,31 @@ RESULT status=SAT|UNSAT|OPTIMUM|UNKNOWN|ERROR value=<objectif ou -> time=<second
 ailleurs), sans droits root, et écrit sa version exacte (tag ou commit, sha256 du binaire) dans
 `/scratch/arthur/tools/bench/NOM/VERSION`. `solvers/NOM/INFO` dit en une ligne le paradigme, le
 format d'entrée et ce que le solveur sait prouver.
+
+## État au 19/11
+
+24 solveurs sont installés sur le nœud. `run/smoke.sh` les lance tous sur les instances de test,
+et les 91 runs donnent la réponse attendue (`run/smoke-result.txt`).
+
+| paradigme | solveurs (dossier `solvers/`) | entrée | preuve possible |
+|---|---|---|---|
+| SAT | kissat 4.0.2, cadical 3.1.0 | .cnf | DRAT, LRAT |
+| SAT avec XOR | cryptominisat 5.18.0 | .xnf, .cnf | XLRUP, vérifiée par cake_xlrup (CakeML), installé |
+| recherche locale | yalsat | .cnf | aucune (SAT seulement) |
+| PB | roundingsat, exact | .opb | VeriPB |
+| MaxSAT | uwrmaxsat 2.0.6, evalmaxsat | .wcnf | aucune ici |
+| comptage | ganak 2.9.0, gpmc 1.2.0 (comptage projeté) | .cnf avec `c p show` | aucune |
+| CP avec apprentissage | chuffed, cpsat (OR-Tools 9.15), pumpkin, huub, baguette b403e28 | .dzn (MiniZinc) | DRCP pour pumpkin (son propre format), VeriPB pour baguette |
+| CP sans apprentissage | gecode, gcs | .dzn | VeriPB pour gcs |
+| MILP | highs (1.16 seul, 1.15 par MiniZinc), scip 10.0 | .lp, .dzn | aucune ici (SCIP exact donnerait VIPR) |
+| ASP | clingo 5.8.3 | .asp | aucune |
+| SMT | z3, cvc5 1.4.2 | .smt2 | cvc5 peut en produire (non activé) |
+| programmation dynamique | trellis-dp (le nôtre, Python) | .json | le calcul lui-même |
+
+À savoir :
+- `solvers/common.sh` regroupe les fonctions partagées (version, GMP, ligne RESULT).
+- `solvers/venv312` reconstruit l'environnement Python 3.12 (`/scratch/arthur/tools/bench/venv312`),
+  qui contient dd (BDD avec CUDD), dwave-neal (recuit pour le QUBO) et fpylll (réseaux).
+- Les solveurs MiniZinc prennent `INPUT.dzn TL [ENC]`. `ENC` vaut 1 (XOR) ou 2 (sommes) pour
+  `minweight_chk.mzn`, et `-` pour un modèle sans ENC (`MODEL=.../linear.mzn` pour P3).
+- Bitwuzla (pas d'arithmétique entière) et msolve (FLINT manquant) ne sont pas installés.
