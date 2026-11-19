@@ -59,9 +59,8 @@ Aucune preuve n'est gardée sur `/cluster`, sauf les petites preuves de test sui
 réinstallent avec leurs `benchmark/solvers/*/install.sh`. La licence Gurobi est sur `/cluster` parce
 qu'elle ne se régénère pas sans `grbgetkey`.
 
-L'ancien clone de travail, avec les preuves et les sorties jusqu'au 19/11, est
-`/scratch/arthur/codes-cp-old-2026-11-19`. Ses résultats légers ont été recopiés dans le dépôt sur
-`/cluster`, ses preuves n'ont pas été gardées.
+Le 19/11, les résultats légers de l'ancien clone sur `/scratch` ont été recopiés dans le dépôt sur
+`/cluster`, puis ce clone a été supprimé avec ses preuves.
 
 ## Ce qui est ignoré par git mais gardé sur /cluster
 
