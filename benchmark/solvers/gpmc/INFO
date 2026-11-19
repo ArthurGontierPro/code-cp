@@ -1,0 +1,1 @@
+exact (projected) model counting (#SAT, GPMC 1.2.0); input .cnf, 'c p show' lines switch run.sh to projected mode; proves the count (no certificate)

@@ -1,0 +1,1 @@
+MILP (branch-and-cut), HiGHS 1.16.0 standalone binary built from source; input: CPLEX .lp (decision unless the name contains _opt., or MODE=opt|dec); proves UNSAT and optimality, no certificate

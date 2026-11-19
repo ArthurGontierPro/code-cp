@@ -1,0 +1,1 @@
+CP (lazy clause generation), Pumpkin git 82d30b71 (TU Delft) via MiniZinc 2.10.1; input: .dzn for models/minweight_chk.mzn (+ENC); proves UNSAT and optimality; can log DRCP proofs (not VeriPB), checked by pumpkin-checker, not enabled by run.sh

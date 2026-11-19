@@ -1,0 +1,92 @@
+ok   kissat        golay24_w4.cnf               expected UNSAT        got UNSAT
+ok   kissat        golay24_w8.cnf               expected SAT          got SAT
+ok   kissat        lin_10_4_5.cnf               expected UNSAT        got UNSAT
+ok   kissat        lin_10_4_4.cnf               expected SAT          got SAT
+ok   cadical       golay24_w4.cnf               expected UNSAT        got UNSAT
+ok   cadical       golay24_w8.cnf               expected SAT          got SAT
+ok   cadical       lin_10_4_5.cnf               expected UNSAT        got UNSAT
+ok   cadical       lin_10_4_4.cnf               expected SAT          got SAT
+ok   cryptominisat golay24_w4.cnf               expected UNSAT        got UNSAT
+ok   cryptominisat golay24_w8.cnf               expected SAT          got SAT
+ok   cryptominisat lin_10_4_5.cnf               expected UNSAT        got UNSAT
+ok   cryptominisat lin_10_4_4.cnf               expected SAT          got SAT
+ok   cryptominisat golay24_w4.xnf               expected UNSAT        got UNSAT
+ok   cryptominisat golay24_w8.xnf               expected SAT          got SAT
+ok   yalsat        golay24_w8.cnf               expected SAT          got SAT
+ok   yalsat        golay24_w4.cnf               expected UNKNOWN      got UNKNOWN
+ok   roundingsat   golay24_w4.opb               expected UNSAT        got UNSAT
+ok   roundingsat   golay24_w8.opb               expected SAT          got SAT
+ok   roundingsat   golay24_opt.opb              expected OPTIMUM:8    got OPTIMUM:8
+ok   exact         golay24_w4.opb               expected UNSAT        got UNSAT
+ok   exact         golay24_w8.opb               expected SAT          got SAT
+ok   exact         golay24_opt.opb              expected OPTIMUM:8    got OPTIMUM:8
+ok   uwrmaxsat     golay24_opt.wcnf             expected OPTIMUM:8    got OPTIMUM:8
+ok   evalmaxsat    golay24_opt.wcnf             expected OPTIMUM:8    got OPTIMUM:8
+ok   ganak         golay24_count.cnf            expected SAT:759      got SAT:759
+ok   gpmc          golay24_count.cnf            expected SAT:759      got SAT:759
+ok   chuffed       golay24_w4.dzn 1             expected UNSAT        got UNSAT
+ok   chuffed       golay24_w8.dzn 1             expected SAT          got SAT
+ok   chuffed       golay24_w4.dzn 2             expected UNSAT        got UNSAT
+ok   chuffed       golay24_w8.dzn 2             expected SAT          got SAT
+ok   chuffed       lin_10_4_5.dzn -             expected UNSAT        got UNSAT
+ok   chuffed       lin_10_4_4.dzn -             expected SAT          got SAT
+ok   gecode        golay24_w4.dzn 1             expected UNSAT        got UNSAT
+ok   gecode        golay24_w8.dzn 1             expected SAT          got SAT
+ok   gecode        golay24_w4.dzn 2             expected UNSAT        got UNSAT
+ok   gecode        golay24_w8.dzn 2             expected SAT          got SAT
+ok   gecode        lin_10_4_5.dzn -             expected UNSAT        got UNSAT
+ok   gecode        lin_10_4_4.dzn -             expected SAT          got SAT
+ok   cpsat         golay24_w4.dzn 1             expected UNSAT        got UNSAT
+ok   cpsat         golay24_w8.dzn 1             expected SAT          got SAT
+ok   cpsat         golay24_w4.dzn 2             expected UNSAT        got UNSAT
+ok   cpsat         golay24_w8.dzn 2             expected SAT          got SAT
+ok   cpsat         lin_10_4_5.dzn -             expected UNSAT        got UNSAT
+ok   cpsat         lin_10_4_4.dzn -             expected SAT          got SAT
+ok   highs-mzn     golay24_w4.dzn 1             expected UNSAT        got UNSAT
+ok   highs-mzn     golay24_w8.dzn 1             expected SAT          got SAT
+ok   highs-mzn     golay24_w4.dzn 2             expected UNSAT        got UNSAT
+ok   highs-mzn     golay24_w8.dzn 2             expected SAT          got SAT
+ok   highs-mzn     lin_10_4_5.dzn -             expected UNSAT        got UNSAT
+ok   highs-mzn     lin_10_4_4.dzn -             expected SAT          got SAT
+ok   gcs           golay24_w4.dzn 1             expected UNSAT        got UNSAT
+ok   gcs           golay24_w8.dzn 1             expected SAT          got SAT
+ok   gcs           golay24_w4.dzn 2             expected UNSAT        got UNSAT
+ok   gcs           golay24_w8.dzn 2             expected SAT          got SAT
+ok   gcs           lin_10_4_5.dzn -             expected UNSAT        got UNSAT
+ok   gcs           lin_10_4_4.dzn -             expected SAT          got SAT
+ok   baguette      golay24_w4.dzn 1             expected UNSAT        got UNSAT
+ok   baguette      golay24_w8.dzn 1             expected SAT          got SAT
+ok   baguette      golay24_w4.dzn 2             expected UNSAT        got UNSAT
+ok   baguette      golay24_w8.dzn 2             expected SAT          got SAT
+ok   baguette      lin_10_4_5.dzn -             expected UNSAT        got UNSAT
+ok   baguette      lin_10_4_4.dzn -             expected SAT          got SAT
+ok   pumpkin       golay24_w4.dzn 1             expected UNSAT        got UNSAT
+ok   pumpkin       golay24_w8.dzn 1             expected SAT          got SAT
+ok   pumpkin       golay24_w4.dzn 2             expected UNSAT        got UNSAT
+ok   pumpkin       golay24_w8.dzn 2             expected SAT          got SAT
+ok   pumpkin       lin_10_4_5.dzn -             expected UNSAT        got UNSAT
+ok   pumpkin       lin_10_4_4.dzn -             expected SAT          got SAT
+ok   huub          golay24_w4.dzn 1             expected UNSAT        got UNSAT
+ok   huub          golay24_w8.dzn 1             expected SAT          got SAT
+ok   huub          golay24_w4.dzn 2             expected UNSAT        got UNSAT
+ok   huub          golay24_w8.dzn 2             expected SAT          got SAT
+ok   huub          lin_10_4_5.dzn -             expected UNSAT        got UNSAT
+ok   huub          lin_10_4_4.dzn -             expected SAT          got SAT
+ok   highs         golay24_w4.lp                expected UNSAT        got UNSAT
+ok   highs         golay24_w8.lp                expected SAT          got SAT
+ok   highs         golay24_opt.lp               expected OPTIMUM:8    got OPTIMUM:8
+ok   scip          golay24_w4.lp                expected UNSAT        got UNSAT
+ok   scip          golay24_w8.lp                expected SAT          got SAT
+ok   scip          golay24_opt.lp               expected OPTIMUM:8    got OPTIMUM:8
+ok   clingo        golay24_w4.asp               expected UNSAT        got UNSAT
+ok   clingo        golay24_w8.asp               expected SAT          got SAT
+ok   clingo        golay24_opt.asp              expected OPTIMUM:8    got OPTIMUM:8
+ok   z3            golay24_w4.smt2              expected UNSAT        got UNSAT
+ok   z3            golay24_w8.smt2              expected SAT          got SAT
+ok   cvc5          golay24_w4.smt2              expected UNSAT        got UNSAT
+ok   cvc5          golay24_w8.smt2              expected SAT          got SAT
+ok   trellis-dp    golay24_w4.json              expected UNSAT        got UNSAT
+ok   trellis-dp    golay24_w8.json              expected SAT          got SAT
+ok   trellis-dp    golay24_w8.json opt          expected OPTIMUM:8    got OPTIMUM:8
+ok   trellis-dp    golay24_cnt.json count       expected SAT:759      got SAT:759
+smoke: 91 ok, 0 failed

@@ -1,0 +1,1 @@
+CDCL SAT (Kissat 4.0.2); input .cnf; proves SAT (model) and UNSAT (DRAT/LRAT proof available with a proof-file argument, not used by run.sh)

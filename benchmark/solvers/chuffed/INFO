@@ -1,0 +1,1 @@
+CP (lazy clause generation), Chuffed 0.14 via MiniZinc 2.10.1; input: .dzn for models/minweight_chk.mzn (+ENC); proves UNSAT and optimality, no certificate

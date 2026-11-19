@@ -1,0 +1,1 @@
+CP (lazy clause generation on a SAT engine), Huub huub-v100.1.0 (Monash) via MiniZinc 2.10.1; input: .dzn for models/minweight_chk.mzn (+ENC); proves UNSAT and optimality, no certificate

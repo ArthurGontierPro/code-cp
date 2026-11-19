@@ -1,0 +1,1 @@
+not a solver: installs the shared Python 3.12 venv /scratch/arthur/tools/bench/venv312 (dd with CUDD, dwave-neal, dwave-samplers, fpylll, highspy, pyscipopt, clingo, z3, cvc5) for the coordinator's own Python solvers

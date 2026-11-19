@@ -1,0 +1,1 @@
+CP (propagation + DFS, no learning), Gecode 6.4 via MiniZinc 2.10.1; input: .dzn for models/minweight_chk.mzn (+ENC); proves UNSAT and optimality, no certificate

@@ -1,0 +1,1 @@
+MaxSAT, core-guided + SAT-UNSAT over CaDiCaL (UWrMaxSat 2.0.6, no SCIP); input .wcnf (2022, h lines); proves optimality (no certificate)

@@ -1,0 +1,1 @@
+ASP (CDNL, clasp), clingo 5.8.3 from the pip wheel; input: clingo .asp; proves UNSAT and optimality (#minimize), no certificate

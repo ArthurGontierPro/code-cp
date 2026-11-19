@@ -1,0 +1,1 @@
+stochastic local search SAT (YalSAT 1.0.1, a0fd39f0); input .cnf; finds models only, cannot prove UNSAT (UNKNOWN on timeout)

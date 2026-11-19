@@ -1,0 +1,1 @@
+SMT (CDCL(T), simplex for LIA), z3 from the z3-solver 5.4.1.0 wheel; input: .smt2 (QF_LIA); proves UNSAT, no certificate checked here

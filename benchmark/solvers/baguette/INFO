@@ -1,0 +1,1 @@
+CP with clause/PB learning and VeriPB 3.0 proof logging, baguette b403e28 (our solver); input: .dzn for models/minweight_chk.mzn (+ENC), flattened by MiniZinc 2.10.1; proves UNSAT and optimality, with a VeriPB proof if PROOF=prefix is set

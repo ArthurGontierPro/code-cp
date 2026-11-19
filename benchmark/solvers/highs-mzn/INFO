@@ -1,0 +1,1 @@
+MILP, HiGHS 1.15.1 via MiniZinc 2.10.1 (MiniZinc's linearisation); input: .dzn for models/minweight_chk.mzn (+ENC); proves UNSAT and optimality, no certificate

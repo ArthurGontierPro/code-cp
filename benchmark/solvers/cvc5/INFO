@@ -1,0 +1,1 @@
+SMT (CDCL(T), simplex for LIA), cvc5 1.4.2 static release binary; input: .smt2 (QF_LIA); proves UNSAT, can emit proofs (not enabled by run.sh)

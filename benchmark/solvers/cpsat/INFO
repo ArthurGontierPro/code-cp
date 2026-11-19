@@ -1,0 +1,1 @@
+CP-SAT (LCG + SAT + LP), OR-Tools 9.15 via MiniZinc 2.10.1; input: .dzn for models/minweight_chk.mzn (+ENC); proves UNSAT and optimality, no certificate; set THREADS=8 for its usual portfolio

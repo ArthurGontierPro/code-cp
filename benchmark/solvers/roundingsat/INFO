@@ -1,0 +1,1 @@
+pseudo-Boolean CDCL with cutting planes + LP (RoundingSat, SoPlex on); input .opb; proves SAT, UNSAT and optimality (VeriPB proof with --proof-log, not used by run.sh)

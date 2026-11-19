@@ -1,0 +1,1 @@
+CP with VeriPB proof logging (no learning), Glasgow Constraint Solver via MiniZinc 2.10.1; input: .dzn for models/minweight_chk.mzn (+ENC); proves UNSAT and optimality; can emit a VeriPB proof (--prove, not enabled by run.sh)

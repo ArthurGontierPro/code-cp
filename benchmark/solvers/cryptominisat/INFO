@@ -1,0 +1,1 @@
+CDCL SAT + native XOR / Gauss-Jordan (CryptoMiniSat 5.18.0); input .xnf or .cnf; proves SAT (model) and UNSAT (XLRUP proof if PROOF= is set, checked by the verified cake_xlrup)

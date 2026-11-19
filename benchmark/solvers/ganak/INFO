@@ -1,0 +1,1 @@
+exact projected model counting (#SAT, Ganak 2.9.0, deterministic --prob 0); input .cnf with optional 'c p show' projection lines; proves the count (no certificate)

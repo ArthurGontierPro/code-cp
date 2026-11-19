@@ -75,7 +75,7 @@ for fmt in fmts:
             half = len(r) // 2; nb = max(1, math.ceil(math.log2(half + 1)))
             ys = list(range(top + 1, top + nb + 1)); top += nb
             lines.append(" ".join(f"+1 x{v}" for v in r) + " " + " ".join(f"-{2 ** (j + 1)} x{y}" for j, y in enumerate(ys)) + " = 0 ;")
-            lines.append(" ".join(f"+{2 ** j} x{y}" for j, y in enumerate(ys)) + f" <= {half} ;")
+            lines.append(" ".join(f"-{2 ** j} x{y}" for j, y in enumerate(ys)) + f" >= -{half} ;")   # y <= half (OPB has only >= and =)
         lines.append(" ".join(f"+1 x{v}" for v in X) + " >= 1 ;")
         if fmt == "opb":
             lines.append(" ".join(f"-1 x{v}" for v in X) + f" >= -{w} ;")

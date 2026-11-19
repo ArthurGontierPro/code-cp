@@ -1,0 +1,1 @@
+CDCL SAT (CaDiCaL 3.1.0); input .cnf; proves SAT (model) and UNSAT (DRAT/LRAT/VeriPB proof with a proof-file argument, not used by run.sh)
